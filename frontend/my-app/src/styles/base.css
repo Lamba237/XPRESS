@@ -1,0 +1,86 @@
+:root {
+    /*--------------*/
+    /*  Primary colors  */
+    /*----------------*/
+    --primary-50: #e8f1fd;
+    --primary-100: #b6d3fa;
+    --primary-200: #93bdf8;
+    --primary-300: #629ff4;
+    --primary-400: #448df2;
+    --primary-500: #1570ef;
+    --Primary-primary-600: #1366D9;
+    --primary-700: #0f50aa;
+    --primary-800: #0c3e83;
+    --primary-900: #092f64;
+     
+    /*--------------*/
+    /*  Grey Colors  */
+    /*-------------*/
+    --Gray-50: #f0f1f3;
+    --Grey-100: #d0d3d9;
+    --Grey-200: #b9bdc7;
+    --Grey-300: #989fad;
+    --Grey-400: #858d9d;
+    --Gray-500: #667085;
+    --Gray-300: #D0D5DD;
+    --Grey-600: #5d6679;
+    --Grey-700: #48505e;
+    --Grey-800: #383e49;
+    --Grey-900: #2b2f38;
+    --Grey-grey-900: #2B2F38;
+
+    /*-----------------*/
+    /* Error colors */
+    /*----------------*/
+    --red-50: #feeceb;
+    --red-100: #fac5c1;
+    --red-200: #f8a9a3;
+    --red-300: #f5827a;
+    --red-400: #f36960;
+    --red-500: #f04438;
+    --red-600: #da3e33;
+    --red-700: #aa3028;
+    --red-800: #84251f;
+    --red-900: #651d18;
+
+    /*-----------------*/
+    /* Warning colors */
+    /*----------------*/
+    --warning-50: #fef4e6;
+    --warning-100: #fdddb3;
+    --warning-200: #fbcc8e;
+    --warning-300: #fab55a;
+    --warning-400: #f9a63a;
+    --warning-500: #f79009;
+    --warning-600: #e18308;
+    --warning-700: #af6606;
+    --warning-800: #884f05;
+    --warning-900: #683c04;
+
+    /*-----------------*/
+    /* Success colors */
+    /*----------------*/
+    --success-50: #e7f8f0;
+    --success-100: #b6e9d1;
+    --success-200: #92deba;
+    --success-300: #60cf9b;
+    --success-400: #41c588;
+    --success-500: #12b76a;
+    --success-600: #10a760;
+    --success-700: #0d824b;
+    --success-800: #0a653a;
+    --success-900: success-900;
+
+    /*-----------------*/
+    /* Info colors */
+    /*----------------*/
+    --white: rgb(255, 255, 255);
+}
+
+body {
+    font-family: "Inter";
+    margin: 0;
+    padding: 0;
+    font-style: normal;
+}
+

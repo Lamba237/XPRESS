@@ -1,0 +1,68 @@
+@import "./base.css";
+
+/*Login container stylings*/
+.login-page-container {
+    max-width: 1440px;
+    max-height: 960px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 149px;
+}
+
+/*General styling for the login logo container*/
+.login-page-logo {
+    max-width: 368px;
+    max-height: 363px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 32px;
+    font-family: inherit;
+    font-weight: 600;
+    font-size: 47px;
+    line-height: 100%;
+    letter-spacing: 0%;
+    font-style: normal;
+    color: #009ED8;
+
+}
+.login-page-logo .img {
+    width: 368px;
+    height: 274px;
+}
+
+
+/*Formm container general stylings*/
+.login-form-container {
+    max-width: 360px;
+    height: 562px;
+    align-self: center;
+}
+
+.login-form-container .form-logo {
+    max-width: 360px;
+    height: 146px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 24px;
+    background-color: aqua;
+}
+.login-form-container .form-logo .form-logo-text {
+    width: inherit;
+    height: 74px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 32px;
+    background-color: #009ED8;
+
+}
+
+.login-form-container .form-logo img {
+    width: 64px;
+    height: 48px;
+}
