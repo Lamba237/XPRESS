@@ -1,7 +1,7 @@
-@import "./base.css";
+@import './base.css';
 
-/*Login container stylings - Mobile First*/
-.login-page-container {
+/*Singup container stylings - Mobile First*/
+.signup-page-container {
     width: 100%;
     min-height: 100vh;
     display: flex;
@@ -15,7 +15,7 @@
 
 /* Tablet and up */
 @media (min-width: 768px) {
-    .login-page-container {
+    .signup-page-container {
         gap: 3rem;
         padding: 2rem;
     }
@@ -23,7 +23,7 @@
 
 /* Desktop and up */
 @media (min-width: 1024px) {
-    .login-page-container {
+    .signup-page-container {
         flex-direction: row;
         gap: 149px;
         max-width: 1440px;
@@ -31,7 +31,6 @@
         margin: 0 auto;
     }
 }
-
 /*Mobile and up*/
 @media (max-width:990px) {
    .form-logo-icon {
@@ -39,7 +38,8 @@
    }
 }
 
-/*General styling for the login logo container - Responsive*/
+/*General styling for the Signup logo container - Responsive*/
+
 .login-page-logo {
     width: 100%;
     max-width: 368px;
@@ -56,25 +56,10 @@
     text-align: center;
 }
 
-/* Desktop logo adjustments */
-@media (min-width: 1024px) {
-    .login-page-logo {
-        gap: 2rem;
-    }
-}
-
-.login-page-logo .img {
-    width: min(280px, 80vw);
-    height: auto;
-    max-width: 368px;
-}
-
-
 /*Form container general stylings*/
-.login-form-container {
+.signup-form-container {
     max-width: 360px;
     height: 562px;
-    margin-top: 100px;
     display: flex;
     justify-content: center;
     flex-direction: column;
@@ -82,7 +67,7 @@
 
 }
 
-.login-form-container .form-logo {
+.signup-form-container .form-logo {
     max-width: 360px;
     height: 146px;
     display: flex;
@@ -91,7 +76,7 @@
     align-items: center;
     gap: 24px;
 }
-.login-form-container .form-logo-text {
+.signup-form-container .form-logo-text {
     width: 360px;
     height: 100px;
     display: flex;
@@ -101,7 +86,7 @@
     
 }
 
-.login-form-container .form-logo-text p:first-child {
+.signup-form-container .form-logo-text p:first-child {
     color: var(--Grey-grey-900);
     font-family: inherit;
     font-size: 30px;
@@ -113,7 +98,7 @@
     text-align: center;
 
 }
-.login-form-container .form-logo-text p:last-child {
+.signup-form-container .form-logo-text p:last-child {
     color: var(--Gray-500);
     font-family: inherit;
     font-size: 16px;
@@ -123,9 +108,21 @@
 }
 
 
-.login-form-container .form-logo img {
+.signup-form-container .form-logo img {
     width: 64px;
     height: 48px;
+}
+
+/*Signup form styling*/
+.form-group {
+    width: 360px;
+    height: 464px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 20px;
+    align-self: stretch;
+
 }
 
 /*Form fields stylings*/
@@ -143,6 +140,8 @@
     padding: 10px 14px;
     align-items: center;
     align-self: stretch;
+    outline: none;
+    gap: 6px;
 
     border-radius: 8px;
     font-family: inherit;
@@ -152,11 +151,8 @@
 
 }
 
-
-/*Label styling, for both emails and passwords + checkbox*/
-label, .label {
-    width: 66px;
-    height: 20px;
+/*Label section*/
+.label {
     font-family: inherit;
     font-size: 14px;
     font-style: normal;
@@ -164,94 +160,77 @@ label, .label {
     line-height: 20px;
     color: var(--Grey-700);
 }
-.remember-me {
-    width: 115px;
-}
-.forgot-password {
-    width: 113px;
-    color: var(--Primary-primary-600);
-    cursor: pointer;
-}
-
-.checkbox-field {
+/*Select field styling */
+.select-field {
+    width: 360px;
     display: flex;
     justify-content: flex-start;
     align-items: center;
-    justify-content: space-between;
-    margin-bottom: 24px;
+    gap: 6px;
 }
 
-/*Styling submit button*/
-.submit_btn {
-    width: 360px;
-    height: 44px;
-    padding: 10px 18px;
-
-    border-radius: 4px;
-    border: 1px solid var(--Primary-primary-600);
-    background: var(--Primary-primary-600);
-    box-shadow: 0 1px 2px 0 rgba(16, 24, 40, 0.05);
-
-    font-family: inherit;
-    font-size: 16px;
-    font-style: normal;
-    font: 500;
-    line-height: 24px;
-    margin-bottom: 16px;
-    color: var(--white);
-
-}
-
-.login-with-google {
-    width: 360px;
-    height: 44px;
-    padding: 10px 18px;
-
+.select-field select {
     display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 12px;
-
-    border-radius: 4px;
-    border: 1px solid var(--Gray-300);
-    background-color: var(--white);
-    box-shadow: 0 1px 2px 0 rgba(16, 24, 40, 0.05);
-
-    color: var(--Grey-800);
-    font-family: inherit;
-    font-size: 16px;
-    font-style: normal;
-    font: 500;
-    line-height: 24px;
-    margin-bottom: 16px;
-}
-
-/*Signup Link styling*/
-.signup-link {
-    display: flex;
-    justify-content: center;
+    width: 100%;
+    height: 38px;
+    padding: 10px 14px;
     align-items: flex-start;
-    gap: 4px;
-    align-self: stretch;
+    gap: 10px;
+    outline: none;
+    color: var(--Gray-500);
+
+    border-radius: 8px;
+    border: 1px solid var(--Gray-300);
+    background: var(--White);
+    box-shadow: 0 1px 2px 0 rgba(16, 24, 40, 0.05);
 }
 
-.signup-link p:first-child {
+select option {
+    flex: 1 0 0;
     color: var(--Gray-500);
     font-family: Inter;
-    font-size: 14px;
+    font-size: 16px;
     font-style: normal;
     font-weight: 400;
-    line-height: 20px;
+    line-height: 24px; 
 }
-.signup-link p:last-child {
-    color: var(--Primary-primary-600);
+/*Signup Button*/
+button {
+    display: flex;
+    padding: 10px 18px;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    flex: 1 0 0;
+
+    width: 360px;
+    height: 44px;
+    border-radius: 4px;
+    border: 1px solid var(--Primary-primary-600, #1366D9);
+    background: var(--Primary-primary-600, #1366D9);
+    box-shadow: 0 1px 2px 0 rgba(16, 24, 40, 0.05);
+
+    cursor: pointer;
+    color: var(--White, #FFF);
     font-family: Inter;
-    font-size: 14px;
+    font-size: 16px;
     font-style: normal;
     font-weight: 500;
-    line-height: 20px;
-    cursor: pointer;
+    line-height: 24px; /* 150% */
 }
+
+button:hover:not(:disabled) {
+    background-color: var(--primary-900);
+}
+button:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+button.submitting {
+    background-color: var(--primary-500);
+}
+
 
 /*Error handling*/
 .input-error {
@@ -265,4 +244,31 @@ label, .label {
     margin-top: 4px;
     display: block;
     font-weight: 400;
+}
+
+/*Login Link*/
+.login-link {
+    display: flex;
+    justify-content: center;
+    width: 360px;
+    align-items: flex-start;
+    gap: 4px;
+}
+.login-link p:first-child {
+    color: var(--Grey-grey-500, #667085);
+    font-family: Inter;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 20px; /* 142.857% */
+}
+
+.login-link p:last-child {
+    color: var(--Primary-primary-700, #0F50AA);
+    font-family: Inter;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 20px; /* 142.857% */
+    cursor: pointer;
 }

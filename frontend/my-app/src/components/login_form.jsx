@@ -1,7 +1,74 @@
 import React from 'react';
+import { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 export default function Login_form() {
+
+    const [formData, setFormData] = useState({
+        email: '',
+        password: ''
+    });
+    const [errors, setErrors] = useState({});
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    // Handle input changes
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            [name]: value
+        }));
+
+        // Clear error when user starts typing
+        if (errors[name]) {
+            setErrors(prev => ({
+                ...prev,
+                [name]: ''
+            }));
+        }
+    };
+
+    // Form validation
+    const validateForm = () => {
+        const newErrors = {};
+
+        // Email validation
+        if (!formData.email.trim()) {
+            newErrors.email = 'Email is required';
+        } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+            newErrors.email = 'Please enter a valid email address';
+        }
+
+        // Password validation
+        if (!formData.password) {
+            newErrors.password = 'Password is required';
+        }
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
+    // Handle form submission
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        
+        if (validateForm()) {
+            setIsSubmitting(true);
+
+            // Here you would typically send data to your backend
+            console.log('Login submitted:', formData);
+            
+            // Simulate API call
+            setTimeout(() => {
+                setIsSubmitting(false);
+                alert('Login successful!');
+            }, 1000);
+        }
+    };
+
+
     return (
+
         <div className="login-form-container">
             <div className="form-logo">
                 <img src="./src/assets/xpress_logo.png" alt="login form logo" className="form-logo-icon" />
@@ -13,16 +80,36 @@ export default function Login_form() {
                 </div>
             </div>
 
-            <form className="login-form">
+            <form className="login-form" onSubmit={handleSubmit}>
                 <div className="form-group">
                     <div className="email-field fields">
                         <label htmlFor="email">Email</label>
-                        <input type="email" placeholder="Enter your email" className="input" /> <br /> <br />
+                        <input 
+                        type="email" 
+                            id="email"
+                            name="email"
+                            value={formData.email}
+                            onChange={handleInputChange}
+                            placeholder="Enter your email" 
+                            className={`input ${errors.email ? 'input-error' : ''}`}
+
+                         />
+                         {errors.email && <span className="error-message">{errors.email}</span>}
                     </div>
 
                     <div className="password-field fields">
                         <label htmlFor="password">Password</label>
-                        <input type="password" className="password input"/> <br />
+                        <input 
+                            type="password" 
+                            id="password"
+                            name="password"
+                            value={formData.password}
+                            onChange={handleInputChange}
+                            className={`password input ${errors.password ? 'input-error' : ''}`} 
+                            placeholder="Enter your password"
+                        
+                        /> 
+                        {errors.password && <span className="error-message">{errors.password}</span>}
                     </div>
 
                     <div className="checkbox-field">
@@ -37,15 +124,16 @@ export default function Login_form() {
                     </div>
                     
                     <div className="button-container">
-                        <button type="submit" className="submit_btn">Sign in</button><br />
-                        <button className="login-with-google input">
-                            <img src="./src/assets/Social_icon.jpg" alt="Google icon" />
-                            Sign in with Google
-                        </button>
+                        <button type="submit" className={`submit-btn ${isSubmitting ? 'submitting' : ''}`}
+                            disabled={isSubmitting}>
+                            {isSubmitting ? 'Signing in...' : 'Sign in'}
+                            </button><br />
                     </div>
                     <div className="signup-link">
                         <p>Don’t have an account?</p>
-                        <p>sign up</p>
+                        <Link to="/signup">
+                            <p>sign up</p>
+                        </Link>
                     </div>
                 </div>
             </form>
