@@ -167,7 +167,7 @@ label, .label {
 .remember-me {
     width: 115px;
 }
-.forgot-password {
+.checkbox-field .forgot-password {
     width: 113px;
     color: var(--Primary-primary-600);
     cursor: pointer;
@@ -175,8 +175,7 @@ label, .label {
 
 .checkbox-field {
     display: flex;
-    justify-content: flex-start;
-    align-items: center;
+    width: 360px;
     justify-content: space-between;
     margin-bottom: 24px;
 }

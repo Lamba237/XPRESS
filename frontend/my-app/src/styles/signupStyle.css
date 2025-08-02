@@ -59,6 +59,7 @@
 /*Form container general stylings*/
 .signup-form-container {
     max-width: 360px;
+    padding-top: 40px;
     height: 562px;
     display: flex;
     justify-content: center;
