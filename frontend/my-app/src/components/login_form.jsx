@@ -1,8 +1,12 @@
 import React from 'react';
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+import { auth } from '../../config/firebase';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 
 export default function Login_form() {
+
+    const navigate = useNavigate();
 
     const [formData, setFormData] = useState({
         email: '',
@@ -49,20 +53,48 @@ export default function Login_form() {
     };
 
     // Handle form submission
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         
         if (validateForm()) {
             setIsSubmitting(true);
 
-            // Here you would typically send data to your backend
-            console.log('Login submitted:', formData);
-            
-            // Simulate API call
-            setTimeout(() => {
+            try {
+                // Sign in user with Firebase Auth
+                const userCredential = await signInWithEmailAndPassword(
+                    auth, 
+                    formData.email, 
+                    formData.password
+                );
+                
+                const user = userCredential.user;
+                console.log('User signed in successfully:', user);
+                
+                // Redirect to dashboard after successful login
+                navigate('/');
+                
+            } catch (error) {
+                console.error('Error signing in:', error);
+                
+                // Handle specific Firebase errors
+                let errorMessage = 'Failed to sign in. Please try again.';
+                
+                if (error.code === 'auth/user-not-found') {
+                    errorMessage = 'No account found with this email address.';
+                } else if (error.code === 'auth/wrong-password') {
+                    errorMessage = 'Incorrect password. Please try again.';
+                } else if (error.code === 'auth/invalid-email') {
+                    errorMessage = 'Invalid email address.';
+                } else if (error.code === 'auth/user-disabled') {
+                    errorMessage = 'This account has been disabled.';
+                } else if (error.code === 'auth/too-many-requests') {
+                    errorMessage = 'Too many failed attempts. Please try again later.';
+                }
+                
+                alert(errorMessage);
+            } finally {
                 setIsSubmitting(false);
-                alert('Login successful!');
-            }, 1000);
+            }
         }
     };
 

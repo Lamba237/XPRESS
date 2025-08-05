@@ -1,9 +1,11 @@
-import { Outlet } from 'react-router-dom';
+import React from "react";
+import { Outlet } from "react-router-dom";
+
 
 export default function Home() {
     return (
-        <div className="home-page-container">
+        <div className="home-layout-container">
             <Outlet />
         </div>
-    );
+    )
 }

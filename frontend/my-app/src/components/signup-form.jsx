@@ -1,10 +1,14 @@
 import { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
+
+import { auth } from '../../config/firebase';
+import { createUserWithEmailAndPassword } from 'firebase/auth';
 
 
 export default function SignupForm() {
 
     // Used for navigation to link to login page
+    const navigate = useNavigate();
 
     const [formData, setFormData] = useState({
         name: '',
@@ -68,20 +72,50 @@ export default function SignupForm() {
     };
 
     // Handle form submission
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         
         if (validateForm()) {
             setIsSubmitting(true);
 
-            // Here you would typically send data to your backend
-            console.log('Form submitted:', formData);
+            try {
+                // Create user with Firebase Auth
+                const userCredential = await createUserWithEmailAndPassword(
+                    auth, 
+                    formData.email, 
+                    formData.password
+                );
+                
+                const user = userCredential.user;
+                console.log('User created successfully:', user);
             
-            // Simulate API call
-            setTimeout(() => {
+                // You can redirect to dashboard or login page here
+                // navigate('/dashboard'); // if using useNavigate hook
+                
+            } catch (error) {
+                console.error('Error creating user:', error);
+                
+                // Handle specific Firebase errors
+                let errorMessage = 'Failed to create account. Please try again.';
+                
+                if (error.code === 'auth/email-already-in-use') {
+                    errorMessage = 'This email is already registered.';
+                    alert(errorMessage);
+                    // Redirect to login page after showing the message
+                    setTimeout(() => {
+                        navigate('/login');
+                    }, 1500);
+                    return; // Exit early to avoid showing the general error
+                } else if (error.code === 'auth/weak-password') {
+                    errorMessage = 'Password is too weak.';
+                } else if (error.code === 'auth/invalid-email') {
+                    errorMessage = 'Invalid email address.';
+                }
+                
+                alert(errorMessage);
+            } finally {
                 setIsSubmitting(false);
-                alert('Account created successfully!');
-            }, 1000);
+            }
         }
     };
 
