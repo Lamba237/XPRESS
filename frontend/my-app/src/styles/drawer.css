@@ -1,0 +1,166 @@
+@import "./base.css";
+/*Sidebar logo styling*/
+.logo-container {
+    display: flex;
+    width: 14.5rem;
+    height: 3.5rem;
+    flex-direction: row;
+    justify-content: last baseline;
+    align-items: flex-end;
+    gap: 8px;
+}
+.logo-container span {
+    width: 78px;
+    height: 30px;
+
+    color: var(--Primary-primary-500, #1570EF);
+    text-align: center;
+    font-family: Inter;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 30px; /* 150% */
+}
+
+.logo-container img {
+    width: 4rem;
+    height: 3rem;
+    aspect-ratio: 4/3;
+}
+
+
+/*Drawer Styling (Sidebar)*/
+.drawer {
+    display: flex;
+    width: 280px;
+    height: 960px;
+    padding: 24px 24px 32px 24px;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-shrink: 0;
+    padding: 0;
+
+    border-radius: 0 8px 8px 0;
+    border-right: 1px solid var(--Gray-50);
+    background-color: #fff;
+    overflow-x: scroll;
+}
+
+/*Removing underline and other link stylings*/
+.drawer a {
+    text-decoration: none;
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: center;
+    gap: 12px;
+
+    color: var(--Grey-600);
+    font-family: Inter;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 24px;
+    height: 25px;
+    width: 200px;
+
+   transition: color 0.3s ease, background-color 0.3s ease,
+}
+
+
+
+/* Active/Selected link styling */
+.drawer a.active,
+.drawer a:active {
+    color: var(--primary-500);
+}
+
+.main-icons {
+    display: flex;
+    flex-direction: inherit;
+    width: 232px;
+    height: 500px;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.main-icons li {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+span {
+    color: var( --Grey-600);
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 24px;
+}
+
+.logout-and-settings {
+    display: flex;
+    flex-direction: inherit;
+    align-items: flex-start;
+    justify-content: space-around;
+    gap: 12px;
+    width: 232px;
+    height: 124px;
+}
+
+.logout-and-settings a.active,
+.logout-and-settings a:active {
+    color: var(--primary-500);
+}
+.logout-and-settings li {
+    list-style: none;
+}
+
+/*Styling the search bar*/
+
+.search-bar {
+    width: calc(100vw - 296px);
+    height: 6.25rem;
+    border: 1px solid #EEE;
+    background: #FFF;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-sizing: border-box;
+}
+
+.bell-icon {
+    width: 30px;
+    height: 30px;
+    padding: 2px;
+}
+
+.Search {
+    width: 320px;
+    padding: 10px 16px;
+    border: 1px solid var(--Gray-50);
+    margin-left: 2rem;
+
+    font-family: inherit;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 24px;
+    outline: none;
+}
+
+.Avatar {
+    background: url("../assets/search-bar/avatar.svg") lightgray 50% / cover no-repeat;
+    border-radius: 49%;
+    width: 41.861px;
+    height: 41.825px;
+    flex-shrink: 0;
+
+}
+
+.frame-42 {
+    display: flex;
+    align-items: flex-start;
+    gap: 1.3125rem;
+}

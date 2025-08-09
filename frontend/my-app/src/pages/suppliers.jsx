@@ -1,7 +1,7 @@
 export default function Suppliers() {
     return (
         <div className="reports-container">
-            <h1>Reports</h1>
+            <h1>Supplier</h1>
         </div>
     )
 }
