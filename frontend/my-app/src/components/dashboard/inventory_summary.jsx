@@ -6,7 +6,7 @@ export default function InventorySummary() {
             <div className="inventory-items">
                 <div className="item">
                     <img src="/src/assets/dashboard/Quantity.svg" alt="Inventory Icon" />
-                    <div className="item-details">
+                    <div className="details">
                         <p>868</p>
                         <p>Quantity in hand</p>
                     </div>
@@ -14,10 +14,10 @@ export default function InventorySummary() {
 
                 {/*Verical line*/}
                  <div className="vertical-line"></div>
-                 
+
                 <div className="item">
                     <img src="/src/assets/dashboard/Ontheway.svg" alt="Inventory Icon" />
-                    <div className="item-details">
+                    <div className="details">
                         <p>200</p>
                         <p>To be received</p>
                     </div>

@@ -16,12 +16,7 @@ export default function OrderSummary() {
             ]}
             width={400}
             height={290}
-            sx={{
-                borderRadius: '10px',
-                padding: '20px',
-                border: '1px solid #e0e0e0',
-                boxShadow: '3px 2px 8px rgba(0,0,0,0.1)'
-            }}
+            
         />
     </div>
   );

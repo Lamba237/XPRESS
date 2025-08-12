@@ -1,0 +1,189 @@
+@import './base.css';
+
+.grid-container {
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: 2fr;
+    padding: 22px 32px 22px 32px;
+}
+
+/*Overall Inventory Stylings*/
+.overall-inventory-container {
+    width: 1009px;
+    height: 188px;
+    border-radius: 8px;
+    background: #fff;
+
+    display: flex;
+    justify-content: flex-start;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.Inventory-items {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 55px;
+    padding-left: 16px;
+}
+
+/***************************/
+/*********Vertical Lines***/
+/**************************/
+/**************************/
+/**************************/
+.vertical-line {
+    width: 1px;
+    height: 90px;
+    background: #F0F1F3;    
+}
+
+.item p {
+    margin: 0;
+    padding: 0;
+}
+/*Styling each inventory item*/
+
+/*H3 header styles*/
+.header {
+    font-family: inherit !important;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 24px;
+}
+.item1 .hd-1 {
+    color: var(--primary-500);
+}
+.item2 .hd-2 {
+    color: #E19133;
+}
+.item3 .hd-3 {
+    color: #845EBC;
+}
+
+/*End of H3 header styles*/
+
+.item1 .cat-paragraph {
+    font-family: inherit;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 24px;
+    color: var(--Grey-600);
+}
+
+.item1 {
+    width: 108px;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.item2 {
+    display: flex;
+    width: 188px;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.content {
+    width: 100%;
+    height: 56px;
+    display: flex;
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.content .last-7-days {
+    display: flex;
+    align-items: center;
+    gap: 91px;
+}
+.content .Revenue {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 46px;
+    width: 100%;
+    padding-right: 6px;
+}
+
+.item3 {
+    width: 205px;
+    height: 92px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+}
+/*Manual stylings for paragraph fonts*/
+#bold {
+    color: var(--Grey-600);
+    font-family: Inter;
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 24px;
+}
+
+#small {
+    font-family: Inter;
+    font-size: 14px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 20px;
+}
+
+
+
+
+
+
+
+
+/**************************/
+/**************************/
+/*Product Section */
+/*************************/
+/************************/
+
+.product-container {
+    width: 1009px;
+    height: 606px;
+    border-radius: 8px;
+    background: #fff;
+}
+
+.table-contain h1 {
+    text-align: left;
+    padding-left: 16px;
+    font-family: inherit;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 30px;
+    color: var(--Grey-800);
+}
+ 
+/***********************/
+/*Table header styling*/
+/**********************/
+#header-table {
+    display: flex;
+    justify-content: flex-start;
+}
+
+#header-table h1 {
+    color: var(--Grey-800);
+    font-family: inherit;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 30px;
+}
