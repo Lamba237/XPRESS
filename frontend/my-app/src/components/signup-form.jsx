@@ -190,7 +190,6 @@ export default function SignupForm() {
                         
                         onChange={handleInputChange}
                         >
-                            <option className="admin-option" value="admin">Admin</option>
                             <option className="cashier-option" value="cashier">Cashier</option>
                         </select>
                     </div>

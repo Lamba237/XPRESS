@@ -1,0 +1,324 @@
+@import './base.css';
+
+/*Report container Grid styling*/
+
+.report-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto;
+    justify-content: center;
+    padding: 22px 35px 22px 32px;
+    gap: 22px;
+}
+
+/*************************/
+/*Overview Container*/
+/************************/
+.overview-container {
+    width: 500px;
+    height: 244px;
+    background: var(--white);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    gap: 10px;
+}
+
+.overview-container h1 {
+    margin-left: 12px;
+    font-size: 20px;
+    line-height: 30px;
+    font-style: normal;
+    font-weight: 500;
+    font-family: inherit !important;
+    color: var(--Grey-800);
+    width: 91px;
+    height: 30px;
+}
+
+.overview-container .overview-content1 {
+    width: 452px;
+    height: 56px;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    gap: 110px;
+    padding-left: 17px;
+}
+
+.horizontal-line {
+    width: 550px;
+    height: 1px;
+    background-color: var(--Gray-50);
+}
+
+.overview-container .overview-content2 {
+    padding-left: 19px;
+    width: 499px;
+    height: 56px;
+    display: flex;
+    justify-content: space-evenly;
+    align-items: flex-start;
+    gap: 27px;
+}
+/*Currency*/
+#currency {
+    font-family: inherit !important;
+    font-weight: 600;
+    font-size: 16px;
+    line-height: 24px;
+    color: var(--Grey-600) !important;
+}
+
+#text {
+    font-family: inherit;
+    font-weight: 400;
+    line-height: 20px;
+    font-size: 14px;
+}
+.total-profit .tx-1 {
+    color: rgba(85, 85, 85, 1);
+}
+.revenue .tx-2 {
+    color: #DBA362;
+}
+
+.sales .tx-3 {
+    color: #845EBC;
+    text-align: center;
+}
+
+/********************************/
+/*Best Selling Products section*/
+/*********************************/
+.best-selling-container {
+    width: 490px;
+    height: 244px;
+    background: var(--white);
+    border-radius: 9px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: flex-start;
+    overflow: hidden; /* keep content inside rounded corners */
+}
+
+.best-selling-container .best-selling-header {
+    display: flex !important;
+    justify-content: space-evenly;
+    align-items: center;
+    gap: 170px;
+    width: 100%;
+}
+
+.best-selling-header h1 {
+    font-size: 20px;
+    line-height: 30px;
+    font-style: normal;
+    font-weight: 500;
+    font-family: inherit !important;
+    color: var(--Grey-800);
+}
+
+.best-selling-header p {
+    font-size: 14px;
+    color: var(--primary-700);
+    cursor: pointer;
+}
+
+/* Table wrapper to control scroll area */
+.best-selling-table-wrapper {
+    width: 100%;
+    /* take remaining height under the header */
+    flex: 1;
+}
+
+/* Only enable vertical scroll when See All is active */
+.best-selling-container.show-all .best-selling-table-wrapper {
+    overflow-y: auto;
+}
+
+/* Scoped table styles for best-selling section */
+.best-selling-container table {
+    width: 100%;
+    border-collapse: collapse;
+    overflow-x: scroll;
+}
+
+.best-selling-container .best-selling-table thead th {
+    padding: 6px 10px 0 13px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--Grey-600);
+    text-align: left;
+}
+
+.best-selling-container tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+.best-selling-container tbody tr:hover {
+    background: darkturquoise;
+}
+.best-selling-container tbody td {
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--Gray-50);
+    color: var(--Grey-800);
+    font-size: 14px;
+}
+#green {
+    color: #10A760;
+}
+
+/* Right-align numeric columns (Turnover, Increased By) */
+.best-selling-container table th:nth-child(2),
+.best-selling-container table td:nth-child(2),
+.best-selling-container table th:nth-child(3),
+.best-selling-container table td:nth-child(3) {
+    text-align: left;
+}
+.best-selling-container table tr td:nth-child(1),
+.best-selling-container table tr td:nth-child(3) {
+    text-align: left;
+}
+/* Optional: zebra striping */
+.best-selling-container tbody tr:nth-child(even) {
+    background: #fafbff;
+}
+
+/* Positive/negative percentage helpers if used as classNames */
+.best-selling-container .percent-up { color: #2e7d32; font-weight: 600; }
+.best-selling-container .percent-down { color: #c62828; font-weight: 600; }
+
+/* Style the See All/See Less button in header */
+.best-selling-header p {
+    padding: 6px 10px;
+    border: 1px solid var(--Gray-200);
+    border-radius: 4px;
+    background: #fff;
+    color: var(--Grey-700);
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.2s ease, border-color 0.2s ease;
+}
+.best-selling-header p:hover {
+    background: var(--Gray-50);
+    border-color: var(--Gray-300);
+}
+
+/*********************************/
+/*Profit and Revenue and styling*/
+/********************************/
+.profit_chart-container {
+    width: 1009px;
+    height: 384px;
+    background: #fff;
+    grid-column: 1 / -1;
+}
+
+.profit-header {
+    padding-left: 20px;
+}
+
+.profit-header h1 {
+    color: var(--Grey-800);
+    line-height: 30px;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 500;
+    font-family: inherit !important;
+}
+
+/*****************************/
+/*Best Selling Product Style*/
+/***************************/
+.best-selling-prod-container {
+    grid-column: 1 / -1;
+    width: 1009px;
+    height: 306px;
+    background: var(--white);
+    border-radius:12px;
+    overflow: hidden;
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-start;
+    flex-direction: column;
+}
+
+.best-selling-prod-container .best-selling-prod-header {
+    display: flex !important;
+    justify-content: space-evenly;
+    align-items: center;
+    gap: 740px;
+    width: 100%;
+}
+
+.best-selling-prod-header h1 {
+    font-size: 20px;
+    line-height: 30px;
+    font-style: normal;
+    font-weight: 500;
+    font-family: inherit !important;
+    color: var(--Grey-800);
+}
+
+.best-selling-prod-header p {
+    font-size: 14px;
+    color: var(--primary-700);
+    cursor: pointer;
+}
+.best-selling-prod-header p:hover {
+    padding: 6px 10px;
+    border-radius: 8px;
+    background-color: var(--Gray-50);
+    border-color: var(--Gray-300);
+}
+
+/*Table Wrapper to control scroll area*/
+.best-selling-prod-table-wrapper {
+    width: 100%;
+    flex: 1;
+}
+
+/*Only enable vertical scroll when See All is active*/
+.best-selling-prod-container.show-all .best-selling-prod-table-wrapper {
+    overflow-y: auto;
+}
+
+/*Scoped table styles for best selling section*/
+.best-selling-prod-container table {
+    width: 100%;
+    border-collapse: collapse;
+    overflow-x: scroll;
+}
+
+.best-selling-prod-table thead th{
+    padding: 6px 10px 0 13px;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--Grey-600);
+    text-align: left;
+}
+
+.best-selling-prod-container tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+.best-selling-prod-container tbody tr:hover {
+    background: darkturquoise;
+}
+
+.best-selling-prod-container tbody td {
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--Gray-50);
+    color: var(--Grey-800);
+    font-size: 14px;
+}
+
+.best-selling-prod-container tbody .center {
+    text-align: left;
+}

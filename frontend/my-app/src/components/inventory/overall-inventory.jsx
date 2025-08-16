@@ -46,14 +46,16 @@ export default function OverallInventory() {
                 <div className="item4 item">
                     <p className="header">Low Stock</p>
 
-                    <div className="Ordered">
-                        <p>12</p>
-                        <p>2</p>
-                    </div>
+                    <div className="content">
+                        <div className="Ordered">
+                            <p>12</p>
+                            <p id="small">Ordered</p>
+                        </div>
 
-                    <div className="not-in-stock">
-                        <p>Ordered</p>
-                        <p>Not in Stock</p>
+                        <div className="not-in-stock">
+                            <p>2</p>
+                            <p id="small">Not in Stock</p>
+                        </div>
                     </div>
                 </div>
             </div>

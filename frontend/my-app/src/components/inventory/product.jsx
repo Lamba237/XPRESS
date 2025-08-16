@@ -1,4 +1,4 @@
-import { useState } from 'react'; // Used to manage states
+import { useState, useEffect } from 'react'; // Used to manage states
 import {
     Table,
     TableBody,
@@ -18,7 +18,7 @@ import { styled } from '@mui/material/styles';
 
 
 // Sample product data with required files
-const sampleProducts = [
+const initialProducts = [
     { 
         id: 1, 
         product: 'Laptop Dell XPS 13', 
@@ -251,18 +251,190 @@ const WarningIndicator = styled('span')({
 });
 
 export default function Product() {
+    // Products State
+    const [sampleProducts, setSampleProducts] = useState(initialProducts);
+    
     // Pagination State
     const [currentPage, setCurrentPage] = useState(1);
     const [itemsPerPage] = useState(8); // Show 8 items per page
 
+    // Modal State
+    const [openModal, setOpenModal] = useState(false);
+    
+    // Filter State
+    const [filterAvailability, setFilterAvailability] = useState('All');
+    const [showFilterDropdown, setShowFilterDropdown] = useState(false);
+    
+    // Form State
+    const [formData, setFormData] = useState({
+        product: '',
+        productId: '',
+        category: '',
+        buyingPrice: '',
+        quantity: '',
+        unit: '',
+        expiryDate: '',
+        thresholdValue: '',
+        availability: 'In Stock'
+    });
+
     // This is use to calculate pagination values
-    const totalItems = sampleProducts.length; // Get the length of the sample products
+    const filteredProducts = filterAvailability === 'All' 
+        ? sampleProducts 
+        : sampleProducts.filter(product => product.availability === filterAvailability);
+    
+    const totalItems = filteredProducts.length; // Get the length of the filtered products
     const totalPages = Math.ceil(totalItems / itemsPerPage); // then from there, determine the number of pages
 
     // Calculate which items to show
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
-    const currentItems = sampleProducts.slice(startIndex, endIndex);
+    const currentItems = filteredProducts.slice(startIndex, endIndex);
+
+    // Modal and Form Handlers
+    const handleOpenModal = () => {
+        setOpenModal(true);
+    };
+
+    const handleCloseModal = () => {
+        setOpenModal(false);
+        setFormData({
+            product: '',
+            productId: '',
+            category: '',
+            buyingPrice: '',
+            quantity: '',
+            unit: '',
+            expiryDate: '',
+            thresholdValue: '',
+            availability: 'In Stock'
+        });
+    };
+
+    // Disable background scroll when modal is open
+    useEffect(() => {
+        if (openModal) {
+            // Disable scroll
+            document.body.style.overflow = 'hidden';
+        } else {
+            // Enable scroll
+            document.body.style.overflow = 'unset';
+        }
+
+        // Cleanup function to ensure scroll is enabled when component unmounts
+        return () => {
+            document.body.style.overflow = 'unset';
+        };
+    }, [openModal]);
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setFormData(prev => ({
+            ...prev,
+            [name]: value
+        }));
+    };
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        
+        // Create new product with auto-generated ID
+        const newProduct = {
+            id: sampleProducts.length + 1, // Simple ID generation
+            product: formData.product,
+            buyingPrice: parseFloat(formData.buyingPrice),
+            quantity: parseInt(formData.quantity),
+            thresholdValue: parseInt(formData.thresholdValue),
+            expiryDate: formData.expiryDate,
+            availability: formData.availability
+        };
+        
+        // Add new product to the beginning of the array
+        setSampleProducts(prevProducts => [newProduct, ...prevProducts]);
+        
+        // Log for debugging
+        console.log('New Product Added:', newProduct);
+        
+        // Close modal after submission
+        handleCloseModal();
+        
+        // Reset to first page to show the new product
+        setCurrentPage(1);
+    };
+
+    // Filter Handlers
+    const handleFilterToggle = () => {
+        setShowFilterDropdown(!showFilterDropdown);
+    };
+
+    const handleFilterChange = (availability) => {
+        setFilterAvailability(availability);
+        setShowFilterDropdown(false);
+        setCurrentPage(1); // Reset to first page when filter changes
+    };
+
+    // Close filter dropdown when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (showFilterDropdown && !event.target.closest('.filter-container')) {
+                setShowFilterDropdown(false);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
+    }, [showFilterDropdown]);
+
+    // Download Handler
+    const handleDownload = () => {
+        // Prepare data for download (use filtered products)
+        const dataToDownload = filteredProducts.map(product => ({
+            'Product Name': product.product,
+            'Buying Price': product.buyingPrice,
+            'Quantity': product.quantity,
+            'Threshold Value': product.thresholdValue,
+            'Expiry Date': product.expiryDate,
+            'Availability': product.availability
+        }));
+
+        // Convert to CSV format
+        const headers = Object.keys(dataToDownload[0]);
+        const csvContent = [
+            headers.join(','), // Header row
+            ...dataToDownload.map(row => 
+                headers.map(header => {
+                    const value = row[header];
+                    // Wrap values containing commas in quotes
+                    return typeof value === 'string' && value.includes(',') 
+                        ? `"${value}"` 
+                        : value;
+                }).join(',')
+            )
+        ].join('\n');
+
+        // Create and download the file
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        
+        link.setAttribute('href', url);
+        
+        // Generate filename with current date and filter status
+        const currentDate = new Date().toISOString().split('T')[0];
+        const filterSuffix = filterAvailability !== 'All' ? `_${filterAvailability.replace(' ', '_')}` : '';
+        const filename = `products_inventory_${currentDate}${filterSuffix}.csv`;
+        
+        link.setAttribute('download', filename);
+        link.style.visibility = 'hidden';
+        
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+        console.log(`Downloaded ${dataToDownload.length} products as ${filename}`);
+    };
 
 
 
@@ -368,8 +540,125 @@ export default function Product() {
             <Box sx={{ mb: 3 }}>
                 <div id="header-table">
                     <h1>Products</h1>
+                    <div className="btn-container">
+                        <button id="add-product" onClick={handleOpenModal}>Add Product</button>
+                        <div className="filter-container" style={{ position: 'relative', display: 'inline-block' }}>
+                            <button 
+                                id="filters" 
+                                onClick={handleFilterToggle}
+                                style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '8px',
+                                    padding: '8px 12px',
+                                    border: '1px solid #ddd',
+                                    borderRadius: '4px',
+                                    backgroundColor: showFilterDropdown ? '#f0f0f0' : 'white',
+                                    cursor: 'pointer'
+                                }}
+                            >
+                                <img src="../src/assets/inventory/Filterslines.svg" alt="Filter" />
+                                Filters 
+                            </button>
+                            
+                            {showFilterDropdown && (
+                                <div style={{
+                                    position: 'absolute',
+                                    top: '100%',
+                                    left: 0,
+                                    marginTop: '4px',
+                                    backgroundColor: 'white',
+                                    border: '1px solid #ddd',
+                                    borderRadius: '4px',
+                                    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+                                    zIndex: 1000,
+                                    minWidth: '150px'
+                                }}>
+                                    <div style={{ padding: '8px 0' }}>
+                                        <div style={{ padding: '8px 12px', fontWeight: 'bold', fontSize: '14px', color: '#000' }}>
+                                            Filter by Availability:
+                                        </div>
+                                        {['All', 'In Stock', 'Low Stock', 'Out of Stock', 'Critical'].map((availability) => (
+                                            <button
+                                                key={availability}
+                                                onClick={() => handleFilterChange(availability)}
+                                                style={{
+                                                    color: "#000",
+                                                    width: '100%',
+                                                    padding: '8px 12px',
+                                                    border: 'none',
+                                                    backgroundColor: filterAvailability === availability ? '#fff' : '#eee',
+                                                    cursor: 'pointer',
+                                                    textAlign: 'left',
+                                                    fontSize: '14px',
+                                                    transition: 'background-color 0.2s'
+                                                }}
+                                                onMouseOver={(e) => {
+                                                    if (filterAvailability !== availability) {
+                                                        e.target.style.backgroundColor = 'green';
+                                                    }
+                                                }}
+                                                onMouseOut={(e) => {
+                                                    if (filterAvailability !== availability) {
+                                                        e.target.style.backgroundColor = 'transparent';
+                                                    }
+                                                }}
+                                            >
+                                                {availability} {filterAvailability === availability && '✓'}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+                        </div>
+                        <button 
+                            id="download-all" 
+                            onClick={handleDownload}
+                            style={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: '8px',
+                                padding: '8px 12px',
+                                border: '1px solid #ddd',
+                                borderRadius: '4px',
+                                backgroundColor: 'white',
+                                cursor: 'pointer'
+                            }}
+                        >
+                            Download all
+                        </button>                    </div>
                 </div>
                 {/**buttons to add new products, filter and also download existing table */}
+                
+                {/* Filter Status */}
+                {filterAvailability !== 'All' && (
+                    <div style={{
+                        marginTop: '12px',
+                        padding: '8px 12px',
+                        backgroundColor: '#e3f2fd',
+                        border: '1px solid #2196f3',
+                        borderRadius: '4px',
+                        fontSize: '14px',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '8px'
+                    }}>
+                        <span>Showing products with availability: <strong>{filterAvailability}</strong></span>
+                        <button
+                            onClick={() => handleFilterChange('All')}
+                            style={{
+                                background: 'none',
+                                border: 'none',
+                                color: '#2196f3',
+                                cursor: 'pointer',
+                                textDecoration: 'underline',
+                                fontSize: '14px'
+                            }}
+                        >
+                            Clear filter
+                        </button>
+                    </div>
+                )}
             </Box>
 
             {/************************ */}
@@ -461,6 +750,291 @@ export default function Product() {
                 </Button>
             </Box>
             </Box>
+            
+            {/* Add Product Modal */}
+            {openModal && (
+                <div 
+                    className="modal-overlay" 
+                    onClick={(e) => {
+                        // Close modal when clicking backdrop
+                        if (e.target === e.currentTarget) {
+                            handleCloseModal();
+                        }
+                    }}
+                    style={{
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        zIndex: 1000,
+                        height: '100vh',
+                        overflow: 'hidden'
+                    }}>
+                    <div className="modal-content" style={{
+                        backgroundColor: 'white',
+                        borderRadius: '8px',
+                        padding: '24px',
+                        width: '600px',
+                        maxWidth: '90vw',
+                        maxHeight: '90vh',
+                        overflowY: 'auto',
+                        boxShadow: '0 10px 25px rgba(0, 0, 0, 0.2)'
+                    }}>
+                        <div className="modal-header" style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            marginBottom: '24px'
+                        }}>
+                            <h2 style={{
+                                margin: 0,
+                                fontSize: '24px',
+                                fontWeight: 'bold',
+                                color: '#333'
+                            }}>
+                                New Product
+                            </h2>
+                            <button 
+                                onClick={handleCloseModal}
+                                style={{
+                                    background: 'none',
+                                    border: 'none',
+                                    fontSize: '24px',
+                                    cursor: 'pointer',
+                                    padding: '4px 8px',
+                                    borderRadius: '4px',
+                                    color: '#666'
+                                }}
+                                onMouseOver={(e) => e.target.style.backgroundColor = '#f0f0f0'}
+                                onMouseOut={(e) => e.target.style.backgroundColor = 'transparent'}
+                            >
+                                ×
+                            </button>
+                        </div>
+                        
+                        <form onSubmit={handleSubmit}>
+                            <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '16px' }}>
+                                <div>
+                                    <label style={{ 
+                                        display: '', 
+                                        marginBottom: '8px', 
+                                        fontWeight: '500',
+                                        color: '#333',
+                                        width: '110px'
+                                    }}>
+                                        Product Name *
+                                    </label>
+                                    <input
+                                        type="text"
+                                        name="product"
+                                        value={formData.product}
+                                        onChange={handleInputChange}
+                                        required
+                                        style={{
+                                            width: '100%',
+                                            padding: '12px',
+                                            border: '1px solid #ddd',
+                                            borderRadius: '4px',
+                                            fontSize: '14px',
+                                            boxSizing: 'border-box'
+                                        }}
+                                    />
+                                </div>
+                                
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                                    <div>
+                                        <label style={{ 
+                                            display: 'block', 
+                                            marginBottom: '8px', 
+                                            fontWeight: '500',
+                                            color: '#333',
+                                            width: '110px'
+                                        }}>
+                                            Buying Price *
+                                        </label>
+                                        <input
+                                            type="number"
+                                            name="buyingPrice"
+                                            step="0.01"
+                                            value={formData.buyingPrice}
+                                            onChange={handleInputChange}
+                                            required
+                                            style={{
+                                                width: '100%',
+                                                padding: '12px',
+                                                border: '1px solid #ddd',
+                                                borderRadius: '4px',
+                                                fontSize: '14px',
+                                                boxSizing: 'border-box'
+                                            }}
+                                        />
+                                    </div>
+                                    
+                                    <div>
+                                        <label style={{ 
+                                            display: 'block', 
+                                            marginBottom: '8px', 
+                                            fontWeight: '500',
+                                            color: '#333'
+                                        }}>
+                                            Quantity *
+                                        </label>
+                                        <input
+                                            type="number"
+                                            name="quantity"
+                                            value={formData.quantity}
+                                            onChange={handleInputChange}
+                                            required
+                                            style={{
+                                                width: '100%',
+                                                padding: '12px',
+                                                border: '1px solid #ddd',
+                                                borderRadius: '4px',
+                                                fontSize: '14px',
+                                                boxSizing: 'border-box'
+                                            }}
+                                        />
+                                    </div>
+                                </div>
+                                
+                                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
+                                    <div>
+                                        <label style={{ 
+                                            display: 'block', 
+                                            marginBottom: '8px', 
+                                            fontWeight: '500',
+                                            color: '#333',
+                                            width: '110px',
+                                            height: '24px'
+                                        }}>
+                                            Threshold Value *
+                                        </label>
+                                        <input
+                                            type="number"
+                                            name="thresholdValue"
+                                            value={formData.thresholdValue}
+                                            onChange={handleInputChange}
+                                            required
+                                            style={{
+                                                width: '100%',
+                                                padding: '12px',
+                                                border: '1px solid #ddd',
+                                                borderRadius: '4px',
+                                                fontSize: '14px',
+                                                boxSizing: 'border-box'
+                                            }}
+                                        />
+                                    </div>
+                                    
+                                    <div>
+                                        <label style={{ 
+                                            display: 'block', 
+                                            marginBottom: '8px', 
+                                            fontWeight: '500',
+                                            color: '#333',
+                                            width: '110px'
+                                        }}>
+                                            Expiry Date *
+                                        </label>
+                                        <input
+                                            type="date"
+                                            name="expiryDate"
+                                            value={formData.expiryDate}
+                                            onChange={handleInputChange}
+                                            required
+                                            style={{
+                                                width: '100%',
+                                                padding: '12px',
+                                                border: '1px solid #ddd',
+                                                borderRadius: '4px',
+                                                fontSize: '14px',
+                                                boxSizing: 'border-box'
+                                            }}
+                                        />
+                                    </div>
+                                </div>
+                                
+                                <div>
+                                    <label style={{ 
+                                        display: 'block', 
+                                        marginBottom: '8px', 
+                                        fontWeight: '500',
+                                        color: '#333'
+                                    }}>
+                                        Availability *
+                                    </label>
+                                    <select
+                                        name="availability"
+                                        value={formData.availability}
+                                        onChange={handleInputChange}
+                                        required
+                                        style={{
+                                            width: '100%',
+                                            padding: '12px',
+                                            border: '1px solid #ddd',
+                                            borderRadius: '4px',
+                                            fontSize: '14px',
+                                            boxSizing: 'border-box',
+                                            backgroundColor: 'white'
+                                        }}
+                                    >
+                                        <option value="In Stock">In Stock</option>
+                                        <option value="Low Stock">Low Stock</option>
+                                        <option value="Out of Stock">Out of Stock</option>
+                                        <option value="Critical">Critical</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div style={{ 
+                                display: 'flex', 
+                                justifyContent: 'flex-end', 
+                                gap: '12px', 
+                                marginTop: '24px' 
+                            }}>
+                                <button 
+                                    type="button" 
+                                    onClick={handleCloseModal}
+                                    style={{
+                                        padding: '10px 20px',
+                                        border: '1px solid #ddd',
+                                        borderRadius: '4px',
+                                        backgroundColor: 'white',
+                                        color: '#333',
+                                        cursor: 'pointer',
+                                        fontSize: '14px'
+                                    }}
+                                    onMouseOver={(e) => e.target.style.backgroundColor = '#f8f8f8'}
+                                    onMouseOut={(e) => e.target.style.backgroundColor = 'white'}
+                                >
+                                    Cancel
+                                </button>
+                                <button 
+                                    type="submit"
+                                    style={{
+                                        padding: '10px 20px',
+                                        border: 'none',
+                                        borderRadius: '4px',
+                                        backgroundColor: '#1976d2',
+                                        color: 'white',
+                                        cursor: 'pointer',
+                                        fontSize: '14px'
+                                    }}
+                                    onMouseOver={(e) => e.target.style.backgroundColor = '#1565c0'}
+                                    onMouseOut={(e) => e.target.style.backgroundColor = '#1976d2'}
+                                >
+                                    Add Product
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
         </div>
     )
 }
