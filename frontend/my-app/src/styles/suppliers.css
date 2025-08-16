@@ -1,0 +1,99 @@
+@import './base.css';
+
+.supplier-table-container {
+    background-color: #fff;
+    display: grid;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    margin: 22px 32px 22px 32px;
+    border-radius: 8px;
+    width: 1009px;
+    height: 816px;
+}
+
+
+.supplier-table-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 460px;
+}
+
+.supplier-table-header h1 {
+    color: var(--Grey-800);
+    font-family: inherit;
+    font-size: 28px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 30px;
+}
+
+/*Button container styling*/
+ .btn-supplier-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+ }
+
+ #add-supplier-btn {
+    width: 119px;
+    height: 40px;
+    padding: 10px 16px;
+    border-radius: 4px;
+    background: var(--Primary-primary-600);
+
+    color: #fff;
+    font-family: Inter;
+    font-size: 13px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 20px;
+    transition: all 0.3s ease-out;
+ }
+
+ #add-supplier-btn:hover {
+    background: var(--primary-700);
+    color: #fff;
+ }
+
+ #filter-btn {
+    background: inherit;
+    width: 114px;
+    height: 40px;
+
+    color: var(--Grey-600);
+    font-family: Inter;
+
+    border-radius: 8px;
+    box-shadow: 0 1px 2px 0 rgba(16, 24, 40, 0.05);
+    border-color: var(--Grey-600);
+    transition: all 0.3s ease-out;
+ }
+
+ #filter-btn:hover {
+    background: var(--Gray-300);
+    border: cadetblue;
+ }
+
+ #download-all {
+    width: 120px;
+    height: 40px;
+    padding: 10px 16px;
+    border-radius: 4px;
+    background: inherit;
+
+    color: var(--Grey-600);
+    font-family: Inter;
+    font-size: 13px;
+    font-style: normal;
+    font-weight: 500;
+    line-height: 20px;
+    border-color: var(--Grey-600);
+
+    transition: all 0.3s ease-out;
+}
+
+#download-all:hover {
+    background: var(--Grey-200);
+}
