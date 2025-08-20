@@ -256,7 +256,7 @@ export default function Product() {
     
     // Pagination State
     const [currentPage, setCurrentPage] = useState(1);
-    const [itemsPerPage] = useState(8); // Show 8 items per page
+    const [itemsPerPage] = useState(6); // Show 8 items per page
 
     // Modal State
     const [openModal, setOpenModal] = useState(false);
@@ -534,7 +534,7 @@ export default function Product() {
   
 
     return (
-        <div style={{ backgroundColor: '#fff', borderRadius: '8px', padding: '16px' }}>
+        <div style={{ backgroundColor: '#fff', borderRadius: '8px', padding: '16px' }} className="product-container">
             <Box sx={{ p: 3 }}>
             {/**Table Header */}
             <Box sx={{ mb: 3 }}>

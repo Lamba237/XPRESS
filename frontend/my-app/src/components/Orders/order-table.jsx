@@ -185,7 +185,7 @@ export default function OrdersTable() {
   };
 
   return (
-    <div style={{ backgroundColor: '#fff', borderRadius: '8px', padding: '16px', height: "627px" }}>
+    <div style={{ backgroundColor: '#fff', borderRadius: '8px', padding: '16px', height: "627px", width: '1009px' }}>
       <Box sx={{ p: 3 }}>
         <Box sx={{ mb: 3 }}>
           <div id="header-table">

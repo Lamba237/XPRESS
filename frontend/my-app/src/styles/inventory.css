@@ -191,10 +191,9 @@
 /************************/
 
 .product-container {
-    width: 1009px;
+    max-width: 1009px;
     height: 606px;
     border-radius: 8px;
-    background: #fff;
 }
 
 .table-contain h1 {
