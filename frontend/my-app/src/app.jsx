@@ -11,6 +11,7 @@ import ManageStore from './pages/manage_store.jsx';
 import SalesAndProduct from './pages/sales_and_product.jsx';
 import Settings from './pages/settings.jsx';
 import Logout from './pages/logouts.jsx';
+import ProtectedRoute from './components/ProtectedRoute.jsx';
 
 
 
@@ -25,15 +26,15 @@ export default function App() {
 
                     {/** Main app routes*/}
                     <Route path="/" element={<Home />} >
-                        <Route index element={<Dashboard />} />
-                        <Route path="inventory" element={<Inventory />} />
-                        <Route path="reports" element={<Reports />} />
-                        <Route path="suppliers" element={<Suppliers />} />
-                        <Route path="orders" element={<Orders />} />
-                        <Route path="manage_store" element={<ManageStore />} />
-                        <Route path='sales_and_product' element={<SalesAndProduct />} />
-                        <Route path="settings" element={<Settings />} />
-                        <Route path="logouts" element={<Logout />} />
+                        <Route index element={<ProtectedRoute pageKey="dashboard"><Dashboard /></ProtectedRoute>} />
+                        <Route path="inventory" element={<ProtectedRoute pageKey="inventory"><Inventory /></ProtectedRoute>} />
+                        <Route path="reports" element={<ProtectedRoute pageKey="reports"><Reports /></ProtectedRoute>} />
+                        <Route path="suppliers" element={<ProtectedRoute pageKey="suppliers"><Suppliers /></ProtectedRoute>} />
+                        <Route path="orders" element={<ProtectedRoute pageKey="orders"><Orders /></ProtectedRoute>} />
+                        <Route path="manage_store" element={<ProtectedRoute pageKey="manage_store"><ManageStore /></ProtectedRoute>} />
+                        <Route path='sales_and_product' element={<ProtectedRoute pageKey="sales_and_product"><SalesAndProduct /></ProtectedRoute>} />
+                        <Route path="settings" element={<ProtectedRoute pageKey="settings"><Settings /></ProtectedRoute>} />
+                        <Route path="logouts" element={<ProtectedRoute pageKey="logouts"><Logout /></ProtectedRoute>} />
                         
                     </Route>
                 </Routes>

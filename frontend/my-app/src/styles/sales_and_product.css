@@ -1,0 +1,43 @@
+@import './base.css';
+
+.sales-and-product-container {
+  width: 100%;
+  max-width: 1009px;
+  background: #fff;
+  border-radius: 8px;
+  padding: 0; /* internal padding handled by child Box */
+  margin: 22px auto;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  /* Side padding on narrow screens */
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+.sales-and-product-container h1 {
+  color: var(--Grey-800);
+  font-family: inherit;
+  font-size: 28px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: 30px;
+  margin: 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1100px) {
+  .sales-and-product-container {
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 900px) {
+  .sales-and-product-container h1 { font-size: 24px; }
+  .sales-summary-cards { flex-direction: column; }
+}
+
+@media (max-width: 600px) {
+  .sales-and-product-container { margin: 16px auto; padding-left: 12px; padding-right: 12px; }
+  .sales-and-product-container h1 { font-size: 20px; line-height: 26px; }
+}

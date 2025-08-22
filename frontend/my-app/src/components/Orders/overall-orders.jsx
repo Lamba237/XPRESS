@@ -1,4 +1,5 @@
 export default function OverallOrders() {
+    const formatUSD = (val) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(val);
     return (
         <div className="overall-order-container">
             <h1 className="header-1">Overall Orders</h1>
@@ -16,7 +17,7 @@ export default function OverallOrders() {
                     <div className="content">
                         <div className="last-7-days">
                             <p>32</p>
-                            <p  id="bold">₹25000</p>
+                            <p  id="bold">{formatUSD(25000)}</p>
                         </div>
                         <div className="Revenue">
                             <p id="small">Last 7 days</p>
@@ -32,7 +33,7 @@ export default function OverallOrders() {
                     <div className="content">
                         <div className="last-7-days">
                             <p id="bold">5</p>
-                            <p id="bold">₹2500</p>
+                            <p id="bold">{formatUSD(2500)}</p>
                         </div>       
                         <div className="Revenue">
                             <p id="small">Last 7 days</p>
@@ -53,7 +54,7 @@ export default function OverallOrders() {
                         </div>
 
                         <div className="not-in-stock">
-                            <p>₹2356</p>
+                            <p>{formatUSD(2356)}</p>
                             <p id="small">Cost</p>
                         </div>
                     </div>

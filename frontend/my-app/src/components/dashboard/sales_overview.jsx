@@ -1,4 +1,5 @@
 export default function SalesOverview() {
+    const formatUSD = (val) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(val);
     return (
         <div className="sales-overview-container">
             <h1 className="header-1">Sales Overview</h1>
@@ -8,7 +9,7 @@ export default function SalesOverview() {
                 <div className="logo-content">
                     <img src="/src/assets/dashboard/Sales.svg" />
                     <div className="text-div">
-                        <p>₹ 832</p>
+                        <p>{formatUSD(832)}</p>
                         <p>Sales</p>
                     </div>
                 </div>
@@ -18,7 +19,7 @@ export default function SalesOverview() {
                 <div className="logo-content Revenue">
                     <img src="/src/assets/dashboard/Revenue.svg"/>
                     <div className="text-div">
-                        <p>₹ 18300</p>
+                        <p>{formatUSD(18300)}</p>
                         <p>Revenue</p>
                     </div>
                 </div>
@@ -28,7 +29,7 @@ export default function SalesOverview() {
                 <div className="logo-content profit">
                     <img src="/src/assets/dashboard/Profit.svg"/>
                     <div className="text-div">
-                        <p>₹ 868</p>
+                        <p>{formatUSD(868)}</p>
                         <p>Profit</p>
                     </div>
                 </div>
@@ -38,7 +39,7 @@ export default function SalesOverview() {
                 <div className="logo-content Cost">
                     <img src="/src/assets/dashboard/cost.svg"/>
                     <div className="text-div">  
-                        <p>₹ 17432</p>
+                        <p>{formatUSD(17432)}</p>
                         <p>cost</p>
                     </div>
                 </div>

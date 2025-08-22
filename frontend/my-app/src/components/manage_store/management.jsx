@@ -78,6 +78,18 @@ export default function Management() {
         setOpenModal(false);
     };
 
+    const handleDelete = (index) => {
+        const target = stores[index];
+        if (!target) return;
+        const ok = window.confirm(`Delete store "${target.store}"? This action cannot be undone.`);
+        if (!ok) return;
+        setStores(prev => prev.filter((_, i) => i !== index));
+        // If we deleted the one being edited, close modal
+        if (editingIndex === index) {
+            setOpenModal(false);
+        }
+    };
+
     return (
         <div className="management-container">
             <div id="header-container">
@@ -87,15 +99,38 @@ export default function Management() {
 
             <div className="store-container">
                 {stores.map((store, index) => (
-                    <div className="store-card" key={index}>
+                    <div className="store-card" key={index} style={{ position: 'relative' }}>
                         <div className="store-pics"></div>
                         <div className="store-details">
-                            <h2 className="store-title">{store.store}</h2> 
+                            <h2 className="store-title">{store.store}</h2>
                             <p>{store.location}</p>
                             <p>{store.email}</p>
                             <p>{store.telephone}</p>
                         </div>
-                        <button className="edit-button" onClick={() => handleEditOpen(index)}>Edit</button>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: 8, marginLeft: 'auto', marginRight: 15, marginTop: 15 }}>
+                            <button className="edit-button" onClick={() => handleEditOpen(index)}>Edit</button>
+                            <button
+                                onClick={() => handleDelete(index)}
+                                style={{
+                                    maxWidth: '110px',
+                                    height: '40px',
+                                    borderRadius: '5px',
+                                    background: '#fff',
+                                    color: 'red',
+                                    fontFamily: 'Inter',
+                                    fontSize: '13px',
+                                    fontWeight: 500,
+                                    lineHeight: '20px',
+                                    border: '1px solid var(--Gray-50)',
+                                    cursor: 'pointer',
+                                    transition: 'all .3s ease-out'
+                                }}
+                                onMouseOver={e => { e.currentTarget.style.background = 'var(--Gray-50)'; }}
+                                onMouseOut={e => { e.currentTarget.style.background = '#fff'; }}
+                            >
+                                Delete
+                            </button>
+                        </div>
                     </div>
                 ))}
             </div>

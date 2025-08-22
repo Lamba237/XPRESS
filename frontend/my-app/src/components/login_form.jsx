@@ -3,10 +3,12 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { auth } from '../../config/firebase';
 import { signInWithEmailAndPassword } from 'firebase/auth';
+import { useAuth } from '../hooks/useAuth.js';
 
 export default function Login_form() {
 
     const navigate = useNavigate();
+    const { SUPER_ADMIN_EMAIL } = useAuth();
 
     const [formData, setFormData] = useState({
         email: '',
@@ -68,6 +70,31 @@ export default function Login_form() {
                 );
                 
                 const user = userCredential.user;
+                
+                // Get stored role or default to cashier
+                let storedRole = 'cashier';
+                const stored = localStorage.getItem('xpress_user');
+                if (stored) {
+                    try {
+                        const parsed = JSON.parse(stored);
+                        storedRole = parsed?.role || 'cashier';
+                    } catch (error) {
+                        console.warn('Failed to parse stored role:', error);
+                    }
+                }
+
+                // Apply super admin override
+                const effectiveRole = user.email.toLowerCase() === SUPER_ADMIN_EMAIL.toLowerCase() 
+                    ? 'admin' 
+                    : storedRole;
+
+                // Store updated user info
+                localStorage.setItem('xpress_user', JSON.stringify({
+                    uid: user.uid,
+                    email: user.email,
+                    role: effectiveRole
+                }));
+                
                 console.log('User signed in successfully:', user);
                 
                 // Redirect to dashboard after successful login

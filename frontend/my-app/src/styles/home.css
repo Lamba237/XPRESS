@@ -6,3 +6,22 @@
     height: 100%;
     background: var(--Gray-50);
 }
+
+.sidebar-container {
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+/* Hide sidebar on small screens */
+@media (max-width: 900px) {
+    .home-layout-container { flex-direction: column; }
+    .sidebar-container { position: fixed; top: 0; left: 0; height: 100vh; z-index: 1200; background: #fff; box-shadow: 2px 0 8px rgba(0,0,0,0.08); transform: translateX(-100%); }
+    .sidebar-container.open { transform: translateX(0); }
+    .main-content-container { width: 100%; }
+    .top-bar-responsive { display: flex; align-items: center; gap: 12px; }
+    .menu-toggle { border: 1px solid var(--Gray-200); background: #fff; border-radius: 6px; height: 36px; padding: 0 14px; cursor: pointer; font-size: 14px; }
+}
+
+@media (min-width: 901px) {
+    .top-bar-responsive { display: flex; align-items: center; justify-content: space-between; }
+    .menu-toggle { display: none; }
+}

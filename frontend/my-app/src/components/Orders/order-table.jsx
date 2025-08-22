@@ -184,6 +184,22 @@ export default function OrdersTable() {
     setCurrentPage(1);
   };
 
+  // Delete order
+  const handleDeleteOrder = (orderId) => {
+    const target = orders.find(o => o.orderId === orderId);
+    if (!target) return;
+    const ok = window.confirm(`Delete order ${orderId}? This cannot be undone.`);
+    if (!ok) return;
+    setOrders(prev => {
+      const updated = prev.filter(o => o.orderId !== orderId);
+      // Adjust page if current page now out of range
+      const newFilteredCount = (filterStatus === 'All' ? updated : updated.filter(o => (o.status || '').toLowerCase() === filterStatus.toLowerCase())).length;
+      const newTotalPages = Math.max(1, Math.ceil(newFilteredCount / itemsPerPage));
+      setCurrentPage(p => (p > newTotalPages ? newTotalPages : p));
+      return updated;
+    });
+  };
+
   return (
     <div style={{ backgroundColor: '#fff', borderRadius: '8px', padding: '16px', height: "627px", width: '1009px' }}>
       <Box sx={{ p: 3 }}>
@@ -235,6 +251,7 @@ export default function OrdersTable() {
                 <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Order ID</TableCell>
                 <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Expected Delivery</TableCell>
                 <TableCell sx={{ color: 'white', fontWeight: 'bold', textAlign: 'center' }}>Status</TableCell>
+                <TableCell sx={{ color: 'white', fontWeight: 'bold', textAlign: 'center' }}>Action</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
@@ -246,6 +263,30 @@ export default function OrdersTable() {
                   <TableCell>{o.orderId}</TableCell>
                   <TableCell>{formatDate(o.expectedDelivery)}</TableCell>
                   <TableCell><StatusChip status={o.status} /></TableCell>
+                  <TableCell align="center">
+                    <button
+                      onClick={() => handleDeleteOrder(o.orderId)}
+                      style={{
+                        maxWidth: '110px',
+                        height: '40px',
+                        borderRadius: '5px',
+                        background: '#fff',
+                        color: 'red',
+                        fontFamily: 'Inter',
+                        fontSize: '13px',
+                        fontWeight: 500,
+                        lineHeight: '20px',
+                        border: '1px solid var(--Gray-50)',
+                        cursor: 'pointer',
+                        padding: '0 14px',
+                        transition: 'all .3s ease-out'
+                      }}
+                      onMouseOver={e => { e.currentTarget.style.background = 'var(--Gray-50)'; }}
+                      onMouseOut={e => { e.currentTarget.style.background = '#fff'; }}
+                    >
+                      Delete
+                    </button>
+                  </TableCell>
                 </StyledTableRow>
               ))}
             </TableBody>

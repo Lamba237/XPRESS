@@ -1,23 +1,26 @@
 @import './base.css';
 
 .manage-store-container {
-    width: 1009px;
-    height: 805px;
+    width: 100%;
+    max-width: 1009px;
+    min-height: 805px;
     background-color: var(--white);
-
     display: grid;
     grid-template-columns: 1fr;
     grid-template-rows: auto;
-    margin: 22px 32px 22px 32px;
+    margin: 22px auto;
+    padding: 0 16px;
     border-radius: 8px;
     overflow-y: auto; /* enable scrolling when content exceeds assigned height */
     overflow-x: hidden;
+    box-sizing: border-box;
 }
 #header-container {
     display: flex;
     align-items: center;
-    justify-content: center;
-    gap: 650px;
+    justify-content: space-between;
+    gap: 32px;
+    flex-wrap: wrap;
 }
 
 #header-container h1 {
@@ -73,12 +76,24 @@
 .store-container {
     display: flex;
     flex-direction: column;
-    width: 826px;
+    width: 100%;
     /* let content define the height so parent can scroll */
     height: auto;
     min-height: 150px;
     gap: 39px;
-    margin-left: 40px;
+    margin-left: 0;
+}
+
+@media (max-width: 900px) {
+    .manage-store-container { padding: 0 12px; }
+    #header-container h1 { font-size: 24px; }
+    .store-card { flex-direction: column; height: auto; padding: 16px; align-items: flex-start; }
+    .store-container { gap: 28px; }
+}
+
+@media (max-width: 600px) {
+    #header-container h1 { font-size: 20px; line-height: 26px; }
+    button.edit-button { margin-left: 0; }
 }
 
 .store-name {

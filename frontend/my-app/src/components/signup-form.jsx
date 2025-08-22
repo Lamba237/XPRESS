@@ -3,18 +3,20 @@ import { Link, useNavigate } from 'react-router-dom';
 
 import { auth } from '../../config/firebase';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
+import { useAuth } from '../hooks/useAuth.js';
 
 
 export default function SignupForm() {
 
     // Used for navigation to link to login page
     const navigate = useNavigate();
+    const { SUPER_ADMIN_EMAIL } = useAuth();
 
     const [formData, setFormData] = useState({
         name: '',
         email: '',
         password: '',
-        role: 'admin' //This is the default role vale
+        role: 'cashier' // Default role is cashier
     })
     const [errors, setErrors] = useState({});
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -87,10 +89,23 @@ export default function SignupForm() {
                 );
                 
                 const user = userCredential.user;
+                
+                // Determine effective role (super admin override)
+                const effectiveRole = formData.email.toLowerCase() === SUPER_ADMIN_EMAIL.toLowerCase() 
+                    ? 'admin' 
+                    : formData.role;
+
+                // Store user info with role
+                localStorage.setItem('xpress_user', JSON.stringify({
+                    uid: user.uid,
+                    email: user.email,
+                    role: effectiveRole
+                }));
+                
                 console.log('User created successfully:', user);
             
-                // You can redirect to dashboard or login page here
-                // navigate('/dashboard'); // if using useNavigate hook
+                // Navigate to dashboard after successful signup
+                navigate('/');
                 
             } catch (error) {
                 console.error('Error creating user:', error);
@@ -184,13 +199,15 @@ export default function SignupForm() {
                     </div>
 
                     <div className="select-field">
-                        <label htmlFor="role" className="label">Option*</label>
+                        <label htmlFor="role" className="label">Role*</label>
                         <select 
-                        className="input-select"
-                        
-                        onChange={handleInputChange}
+                            name="role"
+                            value={formData.role}
+                            className="input-select"
+                            onChange={handleInputChange}
                         >
-                            <option className="cashier-option" value="cashier">Cashier</option>
+                            <option value="cashier">Cashier</option>
+                            <option value="admin">Admin</option>
                         </select>
                     </div>
 

@@ -1,4 +1,5 @@
 export default function PurchaseOverview() {
+    const formatUSD = (val) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 }).format(val);
     return (
         <div className="sales-overview-container">
             <h1 className="header-1">Purchase Overview</h1>
@@ -18,7 +19,7 @@ export default function PurchaseOverview() {
                 <div className="logo-content Revenue">
                     <img src="/src/assets/dashboard/Cost.svg"/>
                     <div className="text-div">
-                        <p>₹ 13500</p>
+                        <p>{formatUSD(13500)}</p>
                         <p>Cost</p>
                     </div>
                 </div>
@@ -38,7 +39,7 @@ export default function PurchaseOverview() {
                 <div className="logo-content Cost">
                     <img src="/src/assets/dashboard/Profit.svg"/>
                     <div className="text-div returning-p">  
-                        <p>₹ 17432</p>
+                        <p>{formatUSD(17432)}</p>
                         <p>Return</p>
                     </div>
                 </div>

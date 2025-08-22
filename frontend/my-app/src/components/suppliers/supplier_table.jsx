@@ -93,6 +93,22 @@ export default function SupplierTable() {
 
   const totalPages = Math.max(1, Math.ceil(filteredSuppliers.length / rowsPerPage));
 
+  // Delete supplier handler (mirrors delete patterns elsewhere)
+  const handleDeleteSupplier = (globalIndex) => {
+    if (!window.confirm('Are you sure you want to delete this supplier?')) return;
+    setSuppliers((prev) => {
+      const next = [...prev];
+      next.splice(globalIndex, 1);
+      // Recalculate pagination AFTER deletion respecting current filter
+      const newFiltered = filterType === 'All' ? next : next.filter((s) => (s.type || '') === filterType);
+      const newTotalPages = Math.max(1, Math.ceil(newFiltered.length / rowsPerPage));
+      if (page > newTotalPages - 1) {
+        setPage(newTotalPages - 1);
+      }
+      return next;
+    });
+  };
+
   // Filter handlers
   const handleFilterToggle = () => setShowFilterDropdown((v) => !v);
   const handleFilterChange = (value) => {
@@ -235,6 +251,7 @@ export default function SupplierTable() {
                   <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Email</TableCell>
                   <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Type</TableCell>
                   <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>On the way</TableCell>
+                  <TableCell sx={{ color: 'white', fontWeight: 'bold' }}>Action</TableCell>
                 </TableRow>
               </TableHead>
 
@@ -247,12 +264,38 @@ export default function SupplierTable() {
                     <TableCell>{s.email}</TableCell>
                     <TableCell sx={{ fontWeight: 400, color: ((s.type || '').toLowerCase() === 'not taking return') ? '#d32f2f' : ((s.type || '').toLowerCase() === 'taking return') ? '#2e7d32' : 'inherit' }}>{s.type}</TableCell>
                     <TableCell>{s.onTheWay}</TableCell>
+                    <TableCell>
+                      <button
+                        onClick={() => handleDeleteSupplier(page * rowsPerPage + idx)}
+                        style={{
+                          maxWidth: '100px',
+                          height: '40px',
+                          borderRadius: '8px',
+                          border: '1px solid var(--Gray-200, #CFD4DC)',
+                          background: 'var(--Base-White, #FFF)',
+                          color: 'var(--Error-500, #F04438)',
+                          fontSize: '14px',
+                          fontWeight: 500,
+                          lineHeight: '20px',
+                          cursor: 'pointer',
+                          display: 'flex',
+                          justifyContent: 'center',
+                          alignItems: 'center',
+                          padding: '10px 16px',
+                          transition: 'background-color 0.2s ease'
+                        }}
+                        onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = 'var(--Gray-50, #F9FAFB)')}
+                        onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = 'var(--Base-White, #FFF)')}
+                      >
+                        Delete
+                      </button>
+                    </TableCell>
                   </StyledTableRow>
                 ))}
 
                 {paged.length < rowsPerPage && (
                   <TableRow style={{ height: 30 * (rowsPerPage - paged.length) }}>
-                    <TableCell colSpan={6} />
+                    <TableCell colSpan={7} />
                   </TableRow>
                 )}
               </TableBody>

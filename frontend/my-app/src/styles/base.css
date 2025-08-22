@@ -77,6 +77,8 @@
     --white: rgb(255, 255, 255);
 }
 
+/* (Dark mode removed) */
+
 body {
     font-family: "Inter";
     margin: 0;

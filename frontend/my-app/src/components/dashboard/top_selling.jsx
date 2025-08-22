@@ -15,16 +15,16 @@ function CreateData(name, sold_quantity, remaining_quantity, price) {
 
 /*Declaring a row to hold the table data*/
 const rows = [
-    CreateData("Surf Excel", 30, 12, '₹100'),
-    CreateData("Rin", 21, 15, '₹207'),
-    CreateData("Parle G", 19, 17, '₹105'),
-    CreateData("Maggi Noodles", 25, 8, '₹85'),
-    CreateData("Coca Cola", 18, 22, '₹45'),
-    CreateData("Lux Soap", 16, 14, '₹35'),
-    CreateData("Tata Salt", 14, 26, '₹25'),
-    CreateData("Dove Shampoo", 12, 18, '₹150'),
-    CreateData("Kurkure", 11, 13, '₹20'),
-    CreateData("Biscuit Gold", 9, 21, '₹40'),
+    CreateData("Surf Excel", 30, 12, 100),
+    CreateData("Rin", 21, 15, 207),
+    CreateData("Parle G", 19, 17, 105),
+    CreateData("Maggi Noodles", 25, 8, 85),
+    CreateData("Coca Cola", 18, 22, 45),
+    CreateData("Lux Soap", 16, 14, 35),
+    CreateData("Tata Salt", 14, 26, 25),
+    CreateData("Dove Shampoo", 12, 18, 150),
+    CreateData("Kurkure", 11, 13, 20),
+    CreateData("Biscuit Gold", 9, 21, 40),
 ];
 
 export default function TopSelling() {
@@ -47,6 +47,8 @@ export default function TopSelling() {
 
     // This gets the rows to display based on current state
     const displayRows = rows.slice(0, itemsToShow);
+
+    const formatUSD = (val) => new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 2 }).format(val);
 
     return (
         <div className="top-selling-container">
@@ -81,7 +83,7 @@ export default function TopSelling() {
                                     </TableCell>
                                     <TableCell align="center">{row.sold_quantity}</TableCell>
                                     <TableCell align="center">{row.remaining_quantity}</TableCell>
-                                    <TableCell align="center">{row.price}</TableCell>
+                                    <TableCell align="center">{formatUSD(row.price)}</TableCell>
                                 </TableRow>
                             ))}
                         </TableBody>
