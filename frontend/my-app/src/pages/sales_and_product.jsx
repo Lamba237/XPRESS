@@ -1,5 +1,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import '../styles/sales_and_product.css';
+import { getProducts, writeProductsBatch, writeSaleRecord, getSales } from '../services/database';
+import { useContext } from 'react';
+import { AuthContext } from '../context/authContext.js';
 import {
     Box,
     Paper,
@@ -11,48 +14,15 @@ import {
     Divider,
 } from '@mui/material';
 
-// LocalStorage keys
-const LS_INVENTORY_KEY = 'inventoryProducts';
+// Sales history kept locally for now; inventory comes from Firebase
 const LS_SALES_KEY = 'salesHistory';
-
-// Seed data (only if none exists yet)
-const seedProducts = [
-    { id: 1, product: 'Classic Potato Chips', buyingPrice: 120, quantity: 85, thresholdValue: 20, expiryDate: '2025-12-31', availability: 'In Stock' },
-    { id: 2, product: 'Cream-O Biscuits', buyingPrice: 90, quantity: 64, thresholdValue: 15, expiryDate: '2025-10-15', availability: 'In Stock' },
-    { id: 3, product: 'Tata Salt', buyingPrice: 70, quantity: 120, thresholdValue: 30, expiryDate: '2026-01-10', availability: 'In Stock' },
-    { id: 4, product: 'Horlicks Malt', buyingPrice: 450, quantity: 42, thresholdValue: 10, expiryDate: '2025-09-05', availability: 'Low Stock' },
-];
-
-function loadInventory() {
-    try {
-        const raw = localStorage.getItem(LS_INVENTORY_KEY);
-        if (!raw) {
-            localStorage.setItem(LS_INVENTORY_KEY, JSON.stringify(seedProducts));
-            return [...seedProducts];
-        }
-        return JSON.parse(raw) || [];
-    } catch {
-        return [...seedProducts];
-    }
-}
-
-function saveInventory(data) {
-    localStorage.setItem(LS_INVENTORY_KEY, JSON.stringify(data));
-}
 
 function saveSale(sale) {
     const prev = JSON.parse(localStorage.getItem(LS_SALES_KEY) || '[]');
     prev.unshift(sale);
     localStorage.setItem(LS_SALES_KEY, JSON.stringify(prev));
 }
-
-function loadSalesHistory() {
-    try {
-        return JSON.parse(localStorage.getItem(LS_SALES_KEY) || '[]');
-    } catch {
-        return [];
-    }
-}
+function loadSalesHistory() { try { return JSON.parse(localStorage.getItem(LS_SALES_KEY) || '[]'); } catch { return []; } }
 
 function availabilityFrom(quantity, threshold) {
     if (quantity <= 0) return 'Out of Stock';
@@ -81,11 +51,18 @@ const availabilityChip = (availability) => {
 };
 
 export default function SalesAndProduct() {
-    const [inventory, setInventory] = useState(() => loadInventory());
+    const { user } = useContext(AuthContext);
+    const [inventory, setInventory] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
     const [search, setSearch] = useState('');
     const [cart, setCart] = useState([]); // {id, product, unitPrice, quantity, max}
     const [submitting, setSubmitting] = useState(false);
     const [salesHistory, setSalesHistory] = useState(() => loadSalesHistory());
+    const [remoteSales, setRemoteSales] = useState([]); // from Firebase
+    const [showSalesLog, setShowSalesLog] = useState(false);
+    const [loadingSales, setLoadingSales] = useState(false);
+    const [salesError, setSalesError] = useState(null);
 
     // Filter inventory by search
     const filteredInventory = useMemo(() => {
@@ -163,24 +140,47 @@ export default function SalesAndProduct() {
                 lineTotal: l.unitPrice * l.quantity,
             })),
             subtotal,
+            userEmail: user?.email || '',
+            userId: user?.uid || '',
         };
 
-        // Simulate slight processing delay
-        setTimeout(() => {
-            setInventory(newInventory);
-            saveInventory(newInventory);
-            saveSale(saleRecord);
-            setSalesHistory(prev => [saleRecord, ...prev]);
-            setCart([]);
-            setSubmitting(false);
-        }, 250);
+                // Persist updated inventory to Firebase in a single batch
+                        writeProductsBatch(newInventory)
+                            .then(async () => {
+                                setInventory(newInventory);
+                                saveSale(saleRecord); // local backup
+                                setSalesHistory(prev => [saleRecord, ...prev]);
+                                try { await writeSaleRecord(saleRecord); } catch (e) { console.warn('Failed to log sale remotely', e); }
+                                setCart([]);
+                            })
+                            .catch(err => console.error('Failed updating inventory', err))
+                            .finally(() => setSubmitting(false));
     };
 
-    // External tab sync
+    // Fetch inventory from Firebase once
     useEffect(() => {
-        const sync = () => setInventory(loadInventory());
-        window.addEventListener('storage', sync);
-        return () => window.removeEventListener('storage', sync);
+        const fetchInventory = async () => {
+            try {
+                setLoading(true); setError(null);
+                const snapshot = await getProducts();
+                if (snapshot.exists()) {
+                    const data = snapshot.val();
+                    const list = Object.values(data || {}).map(p => ({
+                        ...p,
+                        availability: availabilityFrom(p.quantity || 0, p.thresholdValue || 0)
+                    }));
+                    setInventory(list);
+                } else {
+                    setInventory([]);
+                }
+            } catch (e) {
+                console.error('Failed to load inventory', e);
+                setError('Failed to load inventory');
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchInventory();
     }, []);
 
     // Keep cart max & adjust quantity if inventory changed
@@ -220,6 +220,26 @@ export default function SalesAndProduct() {
         }
         return { totalSales, totalRevenue, totalItemsSold };
     }, [salesHistory]);
+
+    // Fetch remote sales log when toggled open
+    const fetchSalesLog = async () => {
+        try {
+            setLoadingSales(true); setSalesError(null);
+            const snapshot = await getSales();
+            if (snapshot.exists()) {
+                const data = snapshot.val();
+                const list = Object.values(data || {}).sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp));
+                setRemoteSales(list);
+            } else setRemoteSales([]);
+        } catch (e) {
+            console.error('Failed to load sales log', e);
+            setSalesError('Failed to load sales log');
+        } finally { setLoadingSales(false); }
+    };
+
+    useEffect(() => {
+        if (showSalesLog) fetchSalesLog();
+    }, [showSalesLog]);
 
     return (
             <div className="sales-and-product-container">
@@ -272,6 +292,15 @@ export default function SalesAndProduct() {
                         >
                             Clear
                         </Button>
+                        <Button
+                            variant="contained"
+                            color={showSalesLog ? 'secondary' : 'primary'}
+                            onClick={() => setShowSalesLog(v => !v)}
+                            size="small"
+                            sx={{ textTransform: 'none' }}
+                        >
+                            {showSalesLog ? 'Hide Sales Log' : 'Show Sales Log'}
+                        </Button>
                     </div>
                 </Box>
 
@@ -292,14 +321,10 @@ export default function SalesAndProduct() {
                                 </TableRow>
                             </TableHead>
                             <TableBody>
-                                {filteredInventory.length === 0 && (
-                                    <TableRow>
-                                        <TableCell colSpan={5} sx={{ fontStyle: 'italic', color: 'text.secondary' }}>
-                                            No products found.
-                                        </TableCell>
-                                    </TableRow>
-                                )}
-                                {filteredInventory.map(p => {
+                                {loading && (<TableRow><TableCell colSpan={5}>Loading...</TableCell></TableRow>)}
+                                {error && !loading && (<TableRow><TableCell colSpan={5} sx={{ color: 'red' }}>{error}</TableCell></TableRow>)}
+                                {!loading && !error && filteredInventory.length === 0 && (<TableRow><TableCell colSpan={5} sx={{ fontStyle: 'italic', color: 'text.secondary' }}>No products found.</TableCell></TableRow>)}
+                                {!loading && !error && filteredInventory.map(p => {
                                     const chip = availabilityChip(p.availability);
                                     const forceWhite = p.product === 'Cream-O Biscuits' || p.product === 'Tata Salt';
                                     return (
@@ -331,7 +356,64 @@ export default function SalesAndProduct() {
                                 })}
                             </TableBody>
                         </Table>
+                        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1 }}>
+                            <Button variant="outlined" size="small" onClick={() => {
+                                // manual refresh
+                                (async () => {
+                                    try {
+                                        setLoading(true); setError(null);
+                                        const snapshot = await getProducts();
+                                        if (snapshot.exists()) {
+                                            const data = snapshot.val();
+                                            const list = Object.values(data || {}).map(p => ({
+                                                ...p,
+                                                availability: availabilityFrom(p.quantity || 0, p.thresholdValue || 0)
+                                            }));
+                                            setInventory(list);
+                                        } else setInventory([]);
+                                    } catch { setError('Failed to load inventory'); }
+                                    finally { setLoading(false); }
+                                })();
+                            }} disabled={loading} sx={{ textTransform: 'none' }}>Refresh</Button>
+                        </Box>
                     </Paper>
+
+                                        {showSalesLog && (
+                                            <Paper sx={{ p: 2, boxShadow: 3, display: 'flex', flexDirection: 'column' }}>
+                                                <Typography variant="h6" sx={{ mb: 1, fontWeight: 600 }}>Sales Log</Typography>
+                                                <Divider sx={{ mb: 2 }} />
+                                                <Table size="small" stickyHeader aria-label="sales log" sx={{ borderCollapse: 'collapse' }}>
+                                                    <TableHead>
+                                                        <TableRow sx={{ backgroundColor: 'primary.main' }}>
+                                                            <TableCell sx={{ color: '#fff', fontWeight: 'bold' }}>Time</TableCell>
+                                                            <TableCell sx={{ color: '#fff', fontWeight: 'bold' }}>Invoice</TableCell>
+                                                            <TableCell sx={{ color: '#fff', fontWeight: 'bold' }}>Items</TableCell>
+                                                            <TableCell sx={{ color: '#fff', fontWeight: 'bold' }} align="right">Subtotal</TableCell>
+                                                            <TableCell sx={{ color: '#fff', fontWeight: 'bold' }}>User</TableCell>
+                                                        </TableRow>
+                                                    </TableHead>
+                                                    <TableBody>
+                                                        {loadingSales && <TableRow><TableCell colSpan={5}>Loading...</TableCell></TableRow>}
+                                                        {salesError && !loadingSales && <TableRow><TableCell colSpan={5} style={{ color: 'red' }}>{salesError}</TableCell></TableRow>}
+                                                        {!loadingSales && !salesError && remoteSales.length === 0 && <TableRow><TableCell colSpan={5} style={{ fontStyle: 'italic', color: '#666' }}>No sales recorded.</TableCell></TableRow>}
+                                                        {!loadingSales && !salesError && remoteSales.map(sale => (
+                                                            <TableRow key={sale.id} hover>
+                                                                <TableCell sx={{ fontSize: 12 }}>{new Date(sale.timestamp).toLocaleString()}</TableCell>
+                                                                <TableCell sx={{ fontSize: 12 }}>{sale.id}</TableCell>
+                                                                <TableCell sx={{ fontSize: 12 }}>
+                                                                    {Array.isArray(sale.items) ? sale.items.map(it => `${it.product} (x${it.quantity})`).join(', ') : ''}
+                                                                </TableCell>
+                                                                <TableCell align="right" sx={{ fontSize: 12 }}>{formatCurrency(sale.subtotal || 0)}</TableCell>
+                                                                <TableCell sx={{ fontSize: 12 }}>{sale.userEmail || '—'}</TableCell>
+                                                            </TableRow>
+                                                        ))}
+                                                    </TableBody>
+                                                </Table>
+                                                <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 1 }}>
+                                                    <Button variant="outlined" size="small" onClick={fetchSalesLog} disabled={loadingSales} sx={{ textTransform: 'none' }}>Refresh Sales</Button>
+                                                </Box>
+                                            </Paper>
+                                        )}
 
                     {/* Cart / Sale Panel */}
                     <Paper sx={{ p: 2, boxShadow: 3, display: 'flex', flexDirection: 'column' }}>

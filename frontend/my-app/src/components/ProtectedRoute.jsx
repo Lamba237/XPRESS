@@ -9,7 +9,12 @@ export default function ProtectedRoute({ pageKey, children }) {
     return <div style={{ padding: '1rem', textAlign: 'center' }}>Loading...</div>;
   }
 
-  if (!role || !canAccessPage(pageKey)) {
+  if (!role) {
+    // If user is not logged in, redirect to login page
+    return <Navigate to="/login" replace />;
+  }
+
+  if (!canAccessPage(pageKey)) {
     // Redirect to dashboard if user doesn't have access
     return <Navigate to="/" replace />;
   }

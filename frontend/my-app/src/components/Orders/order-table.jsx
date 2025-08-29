@@ -1,44 +1,14 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper, Typography, Chip, Button, Box } from '@mui/material';
 import { styled } from '@mui/material/styles';
+import { getOrders, writeOrderData, deleteOrder } from '../../services/database';
 
-// Mock data for Orders table
-// Shape: { products: string, orderValue: number, quantity: number, orderId: string, expectedDelivery: string (YYYY-MM-DD), status: 'Delayed'|'Confirmed'|'Returned'|'Out for delivery' }
+// Orders table CRUD integrated with Firebase Realtime Database.
+// Shape: { orderId, products, orderValue, quantity, expectedDelivery (YYYY-MM-DD), status }
 
 const ORDER_STATUS = ['All', 'Delayed', 'Confirmed', 'Returned', 'Out for delivery'];
 
-const mockOrders = [
-  { products: 'Basmati Rice (5kg), Sunflower Oil (1L)', orderValue: 245.75, quantity: 12, orderId: 'ORD-2025-0001', expectedDelivery: '2025-08-18', status: 'Confirmed' },
-  { products: 'Bottled Water (500ml) x24',               orderValue: 96.00,  quantity: 24, orderId: 'ORD-2025-0002', expectedDelivery: '2025-08-19', status: 'Out for delivery' },
-  { products: 'Olive Oil (1L), Whole Wheat Bread',       orderValue: 78.40,  quantity: 8,  orderId: 'ORD-2025-0003', expectedDelivery: '2025-08-17', status: 'Delayed' },
-  { products: 'Cream-O Biscuits x12',                    orderValue: 54.30,  quantity: 12, orderId: 'ORD-2025-0004', expectedDelivery: '2025-08-21', status: 'Confirmed' },
-  { products: 'Premium Green Tea, Yoghurt Cups x6',      orderValue: 88.15,  quantity: 10, orderId: 'ORD-2025-0005', expectedDelivery: '2025-08-22', status: 'Out for delivery' },
-  { products: 'Ground Coffee (1kg)',                     orderValue: 132.99, quantity: 5,  orderId: 'ORD-2025-0006', expectedDelivery: '2025-08-20', status: 'Delayed' },
-  { products: 'Classic Potato Chips x20',                orderValue: 60.00,  quantity: 20, orderId: 'ORD-2025-0007', expectedDelivery: '2025-08-18', status: 'Confirmed' },
-  { products: 'Apple Juice (1L) x10',                    orderValue: 47.50,  quantity: 10, orderId: 'ORD-2025-0008', expectedDelivery: '2025-08-23', status: 'Returned' },
-  { products: 'Hand Wash (300ml) x12',                   orderValue: 36.00,  quantity: 12, orderId: 'ORD-2025-0009', expectedDelivery: '2025-08-19', status: 'Out for delivery' },
-  { products: 'Dish Soap (1L) x8',                       orderValue: 32.80,  quantity: 8,  orderId: 'ORD-2025-0010', expectedDelivery: '2025-08-24', status: 'Confirmed' },
-  { products: 'Laundry Detergent (2kg) x5',              orderValue: 110.00, quantity: 5,  orderId: 'ORD-2025-0011', expectedDelivery: '2025-08-20', status: 'Delayed' },
-  { products: 'Tomato Ketchup (750ml) x6',               orderValue: 42.00,  quantity: 6,  orderId: 'ORD-2025-0012', expectedDelivery: '2025-08-21', status: 'Confirmed' },
-  { products: 'Table Salt (1kg) x30',                    orderValue: 27.00,  quantity: 30, orderId: 'ORD-2025-0013', expectedDelivery: '2025-08-22', status: 'Out for delivery' },
-  { products: 'Black Pepper (100g) x12',                 orderValue: 57.60,  quantity: 12, orderId: 'ORD-2025-0014', expectedDelivery: '2025-08-25', status: 'Returned' },
-  { products: 'Granola (500g) x10',                      orderValue: 85.00,  quantity: 10, orderId: 'ORD-2025-0015', expectedDelivery: '2025-08-19', status: 'Confirmed' },
-  { products: 'Coconut Oil (500ml) x7',                  orderValue: 52.50,  quantity: 7,  orderId: 'ORD-2025-0016', expectedDelivery: '2025-08-26', status: 'Delayed' },
-  { products: 'Green Peas (Frozen) x15',                 orderValue: 75.00,  quantity: 15, orderId: 'ORD-2025-0017', expectedDelivery: '2025-08-21', status: 'Out for delivery' },
-  { products: 'Cheddar Cheese (200g) x20',               orderValue: 140.00, quantity: 20, orderId: 'ORD-2025-0018', expectedDelivery: '2025-08-27', status: 'Confirmed' },
-  { products: 'Brown Sugar (1kg) x12',                   orderValue: 48.00,  quantity: 12, orderId: 'ORD-2025-0019', expectedDelivery: '2025-08-23', status: 'Delayed' },
-  { products: 'Pasta (500g) x24',                        orderValue: 72.00,  quantity: 24, orderId: 'ORD-2025-0020', expectedDelivery: '2025-08-24', status: 'Confirmed' },
-  { products: 'Honey (250g) x10',                        orderValue: 65.00,  quantity: 10, orderId: 'ORD-2025-0021', expectedDelivery: '2025-08-28', status: 'Returned' },
-  { products: 'Cocoa Powder (200g) x6',                  orderValue: 33.00,  quantity: 6,  orderId: 'ORD-2025-0022', expectedDelivery: '2025-08-22', status: 'Confirmed' },
-  { products: 'Yoghurt Cups (125g) x30',                 orderValue: 90.00,  quantity: 30, orderId: 'ORD-2025-0023', expectedDelivery: '2025-08-20', status: 'Out for delivery' },
-  { products: 'Peanut Butter (500g) x8',                 orderValue: 88.00,  quantity: 8,  orderId: 'ORD-2025-0024', expectedDelivery: '2025-08-26', status: 'Delayed' },
-  { products: 'Canned Tuna (185g) x18',                  orderValue: 81.00,  quantity: 18, orderId: 'ORD-2025-0025', expectedDelivery: '2025-08-23', status: 'Confirmed' },
-  { products: 'Bottled Water (500ml) x48',               orderValue: 192.00, quantity: 48, orderId: 'ORD-2025-0026', expectedDelivery: '2025-08-25', status: 'Out for delivery' },
-  { products: 'Instant Noodles (Pack) x36',              orderValue: 64.80,  quantity: 36, orderId: 'ORD-2025-0027', expectedDelivery: '2025-08-27', status: 'Confirmed' },
-  { products: 'Sunflower Oil (1L) x20',                  orderValue: 140.00, quantity: 20, orderId: 'ORD-2025-0028', expectedDelivery: '2025-08-29', status: 'Delayed' },
-  { products: 'Whole Wheat Bread x40',                   orderValue: 100.00, quantity: 40, orderId: 'ORD-2025-0029', expectedDelivery: '2025-08-21', status: 'Returned' },
-  { products: 'Apple Juice (1L) x20, Cream-O x10',       orderValue: 120.00, quantity: 30, orderId: 'ORD-2025-0030', expectedDelivery: '2025-08-30', status: 'Confirmed' },
-];
+// Removed local mockOrders; data loaded remotely.
 
 // Styled rows
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
@@ -65,8 +35,9 @@ const formatCurrency = (amount) => new Intl.NumberFormat('en-US', { style: 'curr
 const formatDate = (dateString) => new Date(dateString).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
 
 export default function OrdersTable() {
-  // Local orders state to support adding new rows
-  const [orders, setOrders] = useState(mockOrders);
+  const [orders, setOrders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   // Pagination (match look/feel of product.jsx)
   const [currentPage, setCurrentPage] = useState(1);
@@ -87,11 +58,18 @@ export default function OrdersTable() {
     status: 'Confirmed',
   });
 
-  // Derived lists: filter first, then paginate
+  // Helper to determine empty rows (would only show delete button)
+  const isRowEmpty = (o) => {
+    const empty = v => v == null || String(v).trim() === '';
+    // Treat numeric 0 as data (not empty)
+    const numEmpty = v => v == null || (typeof v === 'string' && v.trim() === '');
+    return empty(o.products) && numEmpty(o.orderValue) && numEmpty(o.quantity) && empty(o.orderId) && empty(o.expectedDelivery) && empty(o.status);
+  };
+
+  // Derived lists: filter first, then remove empty rows
   const filteredOrders = useMemo(() => {
-    if (filterStatus === 'All') return orders;
-    const s = filterStatus.toLowerCase();
-    return orders.filter((o) => (o.status || '').toLowerCase() === s);
+    const base = filterStatus === 'All' ? orders : orders.filter(o => (o.status || '').toLowerCase() === filterStatus.toLowerCase());
+    return base.filter(o => !isRowEmpty(o));
   }, [orders, filterStatus]);
 
   const totalItems = filteredOrders.length;
@@ -169,36 +147,64 @@ export default function OrdersTable() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const newOrder = {
-      products: formData.products,
-      orderValue: parseFloat(formData.orderValue || '0'),
-      quantity: parseInt(formData.quantity || '0', 10),
-      orderId: formData.orderId,
-      expectedDelivery: formData.expectedDelivery,
-      status: formData.status,
-    };
-    setOrders((prev) => [newOrder, ...prev]);
-    handleCloseModal();
-    setCurrentPage(1);
+    try {
+      const newOrder = {
+        products: formData.products.trim(),
+        orderValue: parseFloat(formData.orderValue || '0'),
+        quantity: parseInt(formData.quantity || '0', 10),
+        orderId: formData.orderId.trim(),
+        expectedDelivery: formData.expectedDelivery,
+        status: formData.status,
+      };
+      await writeOrderData(newOrder);
+      handleCloseModal();
+      setCurrentPage(1);
+      await loadOrders();
+    } catch (e) {
+      console.error('Failed to add order', e);
+      setError('Failed to add order');
+    }
   };
 
   // Delete order
-  const handleDeleteOrder = (orderId) => {
+  const handleDeleteOrder = async (orderId) => {
     const target = orders.find(o => o.orderId === orderId);
     if (!target) return;
-    const ok = window.confirm(`Delete order ${orderId}? This cannot be undone.`);
-    if (!ok) return;
-    setOrders(prev => {
-      const updated = prev.filter(o => o.orderId !== orderId);
-      // Adjust page if current page now out of range
-      const newFilteredCount = (filterStatus === 'All' ? updated : updated.filter(o => (o.status || '').toLowerCase() === filterStatus.toLowerCase())).length;
-      const newTotalPages = Math.max(1, Math.ceil(newFilteredCount / itemsPerPage));
-      setCurrentPage(p => (p > newTotalPages ? newTotalPages : p));
-      return updated;
-    });
+    if (!window.confirm(`Delete order ${orderId}? This cannot be undone.`)) return;
+    try {
+      await deleteOrder(orderId);
+      await loadOrders();
+    } catch (e) {
+      console.error('Failed to delete order', e);
+      setError('Failed to delete order');
+    }
   };
+
+  // Load orders from Firebase
+  const loadOrders = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const snapshot = await getOrders();
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        const list = Object.values(data || {});
+        list.sort((a, b) => new Date(b.lastUpdated || 0) - new Date(a.lastUpdated || 0));
+        setOrders(list);
+      } else {
+        setOrders([]);
+      }
+    } catch (e) {
+      console.error('Failed to load orders', e);
+      setError('Failed to load orders');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { loadOrders(); }, []);
 
   return (
     <div style={{ backgroundColor: '#fff', borderRadius: '8px', padding: '16px', height: "627px", width: '1009px' }}>
@@ -241,7 +247,12 @@ export default function OrdersTable() {
           </div>
         )}
 
-        <TableContainer component={Paper} sx={{ boxShadow: 3, borderRadius: 0 }}>
+        {/* Refresh button moved above the table */}
+  <Box sx={{ display: 'flex', justifyContent: 'end', mt: 2, mb: 2 }}>
+          <Button onClick={loadOrders} variant="outlined" size="small">Refresh</Button>
+        </Box>
+
+  <TableContainer component={Paper} sx={{ boxShadow: 3, borderRadius: 0 }}>
           <Table sx={{ minWidth: 650, borderCollapse: 'collapse' }} aria-label="orders table">
             <TableHead>
               <TableRow sx={{ backgroundColor: 'primary.main' }}>
@@ -255,7 +266,14 @@ export default function OrdersTable() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {currentItems.map((o, idx) => (
+              {loading && (
+                <TableRow>
+                  <TableCell colSpan={7}>
+                    <Typography variant="body2">Loading orders...</Typography>
+                  </TableCell>
+                </TableRow>
+              )}
+              {!loading && currentItems.map((o, idx) => (
                 <StyledTableRow key={`${o.orderId}-${idx}`}>
                   <TableCell>{o.products}</TableCell>
                   <TableCell>{formatCurrency(o.orderValue)}</TableCell>
@@ -289,14 +307,24 @@ export default function OrdersTable() {
                   </TableCell>
                 </StyledTableRow>
               ))}
+              {!loading && currentItems.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={7}>
+                    <Typography variant="body2" color="text.secondary">No orders found. Add a new order to get started.</Typography>
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </TableContainer>
+        {error && (
+          <Typography color="error" variant="body2" sx={{ mt: 1 }}>{error}</Typography>
+        )}
 
         <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '20px', mt: 3, width: '100%' }}>
-          <Button variant="outlined" onClick={() => setCurrentPage((p) => p - 1)} disabled={currentPage === 1} size="small">Previous</Button>
+          <Button variant="outlined" onClick={() => setCurrentPage((p) => Math.max(1, p - 1))} disabled={currentPage === 1} size="small">Previous</Button>
           <Typography variant="body2" color="text.secondary">Page {currentPage} of {totalPages}</Typography>
-          <Button variant="outlined" onClick={() => setCurrentPage((p) => p + 1)} disabled={currentPage === totalPages} size="small">Next</Button>
+          <Button variant="outlined" onClick={() => setCurrentPage((p) => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages} size="small">Next</Button>
         </Box>
       </Box>
       {/* Add Order Modal */}

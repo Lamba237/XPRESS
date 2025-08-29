@@ -1,29 +1,12 @@
 import React, { useEffect, useState } from 'react';
+import { getStores, writeStoreData, deleteStore } from '../../services/database';
 
-const mockStores = [
-    {
-        store: 'Lisy Store',
-        location: 'Nairobi, 7th Street avenue',
-        email: 'lisatore@gmail.com',
-        telephone: '+254 700 000 000',
-    },
-    {
-        store: 'Xpress Mart - Downtown',
-        location: 'Lagos, Broad Street 24',
-        email: 'downtown@xpressmart.com',
-        telephone: '+234 813 555 0199',
-    },
-    {
-        store: 'Xpress Mart - Eastside',
-        location: 'Accra, Ring Road East 102',
-        email: 'eastside@xpressmart.com',
-        telephone: '+233 54 222 7788',
-    }
-]
+// Layout preserved; data loaded from Firebase instead of mockStores.
 
 export default function Management() {
-    // Local stores state so we can add/edit
-    const [stores, setStores] = useState(mockStores);
+    const [stores, setStores] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     // Modal state
     const [openModal, setOpenModal] = useState(false);
@@ -65,30 +48,62 @@ export default function Management() {
         setFormData((prev) => ({ ...prev, [name]: value }));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         if (!formData.store || !formData.location || !formData.email || !formData.telephone) return;
-
-        if (mode === 'add') {
-            setStores((prev) => [formData, ...prev]);
-        } else if (mode === 'edit' && editingIndex !== null) {
-            setStores((prev) => prev.map((s, i) => (i === editingIndex ? formData : s)));
+        try {
+            if (mode === 'add') {
+                await writeStoreData(formData);
+            } else if (mode === 'edit' && editingIndex !== null) {
+                const target = stores[editingIndex];
+                if (target) {
+                    await writeStoreData({ ...formData, id: target.id });
+                }
+            }
+            setOpenModal(false);
+            await loadStores();
+        } catch (e) {
+            console.error('Failed to save store', e);
+            setError('Failed to save store');
         }
-
-        setOpenModal(false);
     };
 
-    const handleDelete = (index) => {
+    const handleDelete = async (index) => {
         const target = stores[index];
         if (!target) return;
-        const ok = window.confirm(`Delete store "${target.store}"? This action cannot be undone.`);
-        if (!ok) return;
-        setStores(prev => prev.filter((_, i) => i !== index));
-        // If we deleted the one being edited, close modal
-        if (editingIndex === index) {
-            setOpenModal(false);
+        if (!window.confirm(`Delete store "${target.store}"? This action cannot be undone.`)) return;
+        try {
+            await deleteStore(target.id);
+            if (editingIndex === index) setOpenModal(false);
+            await loadStores();
+        } catch (e) {
+            console.error('Failed to delete store', e);
+            setError('Failed to delete store');
         }
     };
+
+    const loadStores = async () => {
+        try {
+            setLoading(true);
+            setError(null);
+            const snapshot = await getStores();
+            if (snapshot.exists()) {
+                const data = snapshot.val();
+                const list = Object.values(data || {});
+                list.sort((a, b) => new Date(b.lastUpdated || 0) - new Date(a.lastUpdated || 0));
+                setStores(list);
+            } else {
+                setStores([]);
+            }
+        } catch (e) {
+            console.error('Failed to load stores', e);
+            setError('Failed to load stores');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => { loadStores(); }, []);
 
     return (
         <div className="management-container">
@@ -97,8 +112,16 @@ export default function Management() {
                 <button id="add-store" onClick={handleAddOpen}>Add Store</button>
             </div>
 
+            {/* Refresh button moved directly under Add Store button */}
+            <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 8, marginBottom: 16 }}>
+                <button onClick={loadStores} className="store-refresh-btn">Refresh</button>
+            </div>
+
             <div className="store-container">
-                {stores.map((store, index) => (
+                {loading && <p style={{ padding: 16 }}>Loading stores...</p>}
+                {error && <p style={{ padding: 16, color: 'red' }}>{error}</p>}
+                {!loading && stores.length === 0 && !error && <p style={{ padding: 16 }}>No stores found. Add one.</p>}
+                {!loading && stores.map((store, index) => (
                     <div className="store-card" key={index} style={{ position: 'relative' }}>
                         <div className="store-pics"></div>
                         <div className="store-details">

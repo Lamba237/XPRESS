@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useAppSettings } from '../context/app/useAppSettings.js';
 import {
     Box,
     Paper,
@@ -15,62 +16,11 @@ import {
 } from '@mui/material';
 import '../styles/settings.css';
 
-// LocalStorage key
-const SETTINGS_KEY = 'appSettings';
-
-const defaultSettings = {
-    org: { name: 'Xpress Mart', address: '', email: '' },
-    currency: 'USD',
-    taxRate: 7.5, // percent
-    inventory: { defaultLowStockMultiplier: 1.5, globalReorderPoint: 10 },
-    appearance: { theme: 'light' },
-};
-
-function loadSettings() {
-    try {
-        const raw = localStorage.getItem(SETTINGS_KEY);
-        if (!raw) {
-            localStorage.setItem(SETTINGS_KEY, JSON.stringify(defaultSettings));
-            return defaultSettings;
-        }
-        return { ...defaultSettings, ...JSON.parse(raw) };
-    } catch {
-        return defaultSettings;
-    }
-}
-
-function saveSettings(data) {
-    localStorage.setItem(SETTINGS_KEY, JSON.stringify(data));
-}
+// Persistence handled by AppSettingsContext now.
 
 export default function Settings() {
-    const [settings, setSettings] = useState(() => loadSettings());
-    const [saving, setSaving] = useState(false);
-
-    // Debounced save
-    useEffect(() => {
-        setSaving(true);
-        const t = setTimeout(() => {
-            saveSettings(settings);
-            setSaving(false);
-        }, 400);
-        return () => clearTimeout(t);
-    }, [settings]);
-
-    const update = useCallback((path, value) => {
-        setSettings(prev => {
-            const next = { ...prev };
-            // path like 'org.name'
-            const parts = path.split('.');
-            let ref = next;
-            for (let i = 0; i < parts.length - 1; i++) {
-                ref[parts[i]] = { ...ref[parts[i]] };
-                ref = ref[parts[i]];
-            }
-            ref[parts[parts.length - 1]] = value;
-            return next;
-        });
-    }, []);
+    const { settings, updateSetting, saving } = useAppSettings();
+    const update = useCallback((path, value) => updateSetting(path, value), [updateSetting]);
 
     const handleExportData = () => {
         const exportObj = {
@@ -90,8 +40,9 @@ export default function Settings() {
         if (!window.confirm('This will clear inventory, sales history and restore default settings. Continue?')) return;
         localStorage.removeItem('inventoryProducts');
         localStorage.removeItem('salesHistory');
-        saveSettings(defaultSettings);
-        setSettings(defaultSettings);
+    // Soft reset to context defaults (clears local storage and reloads page state)
+    localStorage.removeItem('appSettings');
+    window.location.reload();
     };
 
     // Side nav active section

@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react';
+import { getSuppliers, writeSupplierData, deleteSupplier } from '../../services/database';
 import {
   Box,
   Paper,
@@ -15,38 +16,10 @@ import {
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
 
-const mockSuppliers = [
-  { supplierName: 'Alpha Distributors',   product: 'Bottled Water (500ml)',   contactNumber: '555-0101', email: 'contact@alphadist.com',      type: 'Taking Return',     onTheWay: 120 },
-  { supplierName: 'Beta Wholesale',       product: 'Ground Coffee (1kg)',     contactNumber: '555-0102', email: 'sales@betawholesale.com',     type: 'Not Taking Return', onTheWay: 0   },
-  { supplierName: 'Gamma Partners',       product: 'Olive Oil (1L)',          contactNumber: '555-0103', email: 'info@gammapartners.com',      type: 'Taking Return',     onTheWay: 32  },
-  { supplierName: 'Delta Trading',        product: 'Whole Wheat Bread',       contactNumber: '555-0104', email: 'orders@deltatrading.com',      type: 'Taking Return',     onTheWay: 15  },
-  { supplierName: 'Epsilon Imports',      product: 'Instant Noodles (Pack)',  contactNumber: '555-0105', email: 'support@epsilonimports.com',  type: 'Not Taking Return', onTheWay: 0   },
-  { supplierName: 'Zeta Logistics',       product: 'Premium Green Tea',       contactNumber: '555-0106', email: 'hello@zetalogistics.com',      type: 'Taking Return',     onTheWay: 24  },
-  { supplierName: 'Eta Supplies',         product: 'Classic Potato Chips',    contactNumber: '555-0107', email: 'service@etasupplies.com',      type: 'Taking Return',     onTheWay: 54  },
-  { supplierName: 'Theta Merchants',      product: 'Horlicks Malt (500g)',    contactNumber: '555-0108', email: 'team@thetamerchants.com',      type: 'Not Taking Return', onTheWay: 0   },
-  { supplierName: 'Iota Providers',       product: 'Chocolate Bar (50g)',     contactNumber: '555-0109', email: 'contact@iotaproviders.com',   type: 'Taking Return',     onTheWay: 80  },
-  { supplierName: 'Kappa Networks',       product: 'Hand Wash (300ml)',       contactNumber: '555-0110', email: 'cs@kappanetworks.com',        type: 'Taking Return',     onTheWay: 40  },
-  { supplierName: 'Lambda Exporters',     product: 'Dish Soap (1L)',          contactNumber: '555-0111', email: 'orders@lambdaexporters.com',  type: 'Not Taking Return', onTheWay: 0   },
-  { supplierName: 'Mu Warehousing',       product: 'Laundry Detergent (2kg)', contactNumber: '555-0112', email: 'ops@muwarehousing.com',       type: 'Taking Return',     onTheWay: 20  },
-  { supplierName: 'Nu Retail',            product: 'Basmati Rice (5kg)',      contactNumber: '555-0113', email: 'hello@nuretail.com',          type: 'Taking Return',     onTheWay: 12  },
-  { supplierName: 'Xi Distribution',      product: 'Sunflower Oil (1L)',      contactNumber: '555-0114', email: 'sales@xidistribution.com',    type: 'Not Taking Return', onTheWay: 0   },
-  { supplierName: 'Omicron Sourcing',     product: 'Cream-O Biscuits',        contactNumber: '555-0115', email: 'contact@omicronsourcing.com', type: 'Taking Return',     onTheWay: 110 },
-  { supplierName: 'Pi Global',            product: 'Apple Juice (1L)',        contactNumber: '555-0116', email: 'orders@piglobal.com',         type: 'Taking Return',     onTheWay: 26  },
-  { supplierName: 'Rho Foods',            product: 'Peanut Butter (500g)',    contactNumber: '555-0117', email: 'support@rhofoods.com',        type: 'Not Taking Return', onTheWay: 0   },
-  { supplierName: 'Sigma Brands',         product: 'Yoghurt Cups (125g)',     contactNumber: '555-0118', email: 'team@sigmabrands.com',        type: 'Taking Return',     onTheWay: 150 },
-  { supplierName: 'Tau Enterprises',      product: 'Canned Tuna (185g)',      contactNumber: '555-0119', email: 'info@tauenterprises.com',     type: 'Taking Return',     onTheWay: 30  },
-  { supplierName: 'Upsilon Traders',      product: 'Tomato Ketchup (750ml)',  contactNumber: '555-0120', email: 'sales@upsilontraders.com',    type: 'Not Taking Return', onTheWay: 0   },
-  { supplierName: 'Phi Commerce',         product: 'Table Salt (1kg)',        contactNumber: '555-0121', email: 'hello@phicommerce.com',       type: 'Taking Return',     onTheWay: 90  },
-  { supplierName: 'Chi Essentials',       product: 'Black Pepper (100g)',     contactNumber: '555-0122', email: 'contact@chiessentials.com',   type: 'Taking Return',     onTheWay: 12  },
-  { supplierName: 'Psi Provision',        product: 'Granola (500g)',          contactNumber: '555-0123', email: 'orders@psiprovision.com',     type: 'Not Taking Return', onTheWay: 0   },
-  { supplierName: 'Omega Imports',        product: 'Coconut Oil (500ml)',     contactNumber: '555-0124', email: 'ops@omegaimports.com',        type: 'Taking Return',     onTheWay: 18  },
-  { supplierName: 'Aurora Supply Co.',    product: 'Green Peas (Frozen)',     contactNumber: '555-0125', email: 'info@aurorasupply.co',        type: 'Taking Return',     onTheWay: 10  },
-  { supplierName: 'Beacon Distribution',  product: 'Cheddar Cheese (200g)',   contactNumber: '555-0126', email: 'sales@beacondist.com',        type: 'Not Taking Return', onTheWay: 0   },
-  { supplierName: 'Crestline Traders',    product: 'Brown Sugar (1kg)',       contactNumber: '555-0127', email: 'contact@crestline.com',       type: 'Taking Return',     onTheWay: 70  },
-  { supplierName: 'Dawn Retail Partners', product: 'Pasta (500g)',            contactNumber: '555-0128', email: 'hello@dawnretail.com',        type: 'Taking Return',     onTheWay: 105 },
-  { supplierName: 'Evergreen Producers',  product: 'Honey (250g)',            contactNumber: '555-0129', email: 'team@evergreenprod.com',      type: 'Not Taking Return', onTheWay: 0   },
-  { supplierName: 'Frontier Merchants',   product: 'Cocoa Powder (200g)',     contactNumber: '555-0130', email: 'orders@frontiermerchants.com',type: 'Taking Return',     onTheWay: 38  },
-];
+// Removed large mock dataset; will load from Firebase.
+
+// Optional small seed (commented out)
+// const seedSuppliers = [ { supplierName: 'Alpha Distributors', product: 'Bottled Water (500ml)', contactNumber: '555-0101', email: 'contact@alphadist.com', type: 'Taking Return', onTheWay: 120 } ];
 
 // Styled rows to mirror product.jsx zebra and hover
 const StyledTableRow = styled(TableRow)(({ theme }) => ({
@@ -60,10 +33,10 @@ const StyledTableRow = styled(TableRow)(({ theme }) => ({
 
 export default function SupplierTable() {
   const [page, setPage] = useState(0);
-  const rowsPerPage = 9; // match product.jsx items per page
-
-  // Manage suppliers locally to support adding new entries
-  const [suppliers, setSuppliers] = useState(mockSuppliers);
+  const rowsPerPage = 9; // match product table
+  const [suppliers, setSuppliers] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   // Filter state (by Type)
   const [filterType, setFilterType] = useState('All');
@@ -80,11 +53,25 @@ export default function SupplierTable() {
     onTheWay: '',
   });
 
-  // Apply filtering before pagination
-  const filteredSuppliers = useMemo(
-    () => (filterType === 'All' ? suppliers : suppliers.filter((s) => (s.type || '') === filterType)),
-    [suppliers, filterType]
-  );
+  // Helper: determine if a supplier row has no meaningful data (only delete action would show)
+  const isRowEmpty = (s) => {
+    const textEmpty = (v) => v == null || String(v).trim() === '';
+    const onTheWayEmpty = s.onTheWay == null || (typeof s.onTheWay === 'string' && s.onTheWay.trim() === '');
+    return (
+      textEmpty(s.supplierName) &&
+      textEmpty(s.product) &&
+      textEmpty(s.contactNumber) &&
+      textEmpty(s.email) &&
+      textEmpty(s.type) &&
+      onTheWayEmpty
+    );
+  };
+
+  // Apply type filter then remove empty rows
+  const filteredSuppliers = useMemo(() => {
+    const base = filterType === 'All' ? suppliers : suppliers.filter((s) => (s.type || '') === filterType);
+    return base.filter(s => !isRowEmpty(s));
+  }, [suppliers, filterType]);
 
   const paged = useMemo(() => {
     const start = page * rowsPerPage;
@@ -94,20 +81,42 @@ export default function SupplierTable() {
   const totalPages = Math.max(1, Math.ceil(filteredSuppliers.length / rowsPerPage));
 
   // Delete supplier handler (mirrors delete patterns elsewhere)
-  const handleDeleteSupplier = (globalIndex) => {
+  const handleDeleteSupplier = async (globalIndex) => {
+    const supplier = filteredSuppliers[globalIndex];
+    if (!supplier) return;
     if (!window.confirm('Are you sure you want to delete this supplier?')) return;
-    setSuppliers((prev) => {
-      const next = [...prev];
-      next.splice(globalIndex, 1);
-      // Recalculate pagination AFTER deletion respecting current filter
-      const newFiltered = filterType === 'All' ? next : next.filter((s) => (s.type || '') === filterType);
-      const newTotalPages = Math.max(1, Math.ceil(newFiltered.length / rowsPerPage));
-      if (page > newTotalPages - 1) {
-        setPage(newTotalPages - 1);
-      }
-      return next;
-    });
+    try {
+      await deleteSupplier(supplier.id);
+      await loadSuppliers();
+    } catch (e) {
+      console.error('Delete failed', e);
+      setError('Failed to delete supplier');
+    }
   };
+
+  // Load suppliers from Firebase
+  const loadSuppliers = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const snapshot = await getSuppliers();
+      if (snapshot.exists()) {
+        const data = snapshot.val();
+        const list = Object.values(data || {});
+        list.sort((a, b) => new Date(b.lastUpdated || 0) - new Date(a.lastUpdated || 0));
+        setSuppliers(list);
+      } else {
+        setSuppliers([]);
+      }
+    } catch (e) {
+      console.error('Failed to load suppliers', e);
+      setError('Failed to load suppliers');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => { loadSuppliers(); }, []);
 
   // Filter handlers
   const handleFilterToggle = () => setShowFilterDropdown((v) => !v);
@@ -183,19 +192,25 @@ export default function SupplierTable() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const newSupplier = {
-      supplierName: formData.supplierName,
-      product: formData.product,
-      contactNumber: formData.contactNumber,
-      email: formData.email,
-      type: formData.type,
-      onTheWay: parseInt(formData.onTheWay || '0', 10),
-    };
-    setSuppliers((prev) => [newSupplier, ...prev]);
-    handleCloseModal();
-    setPage(0);
+    try {
+      const newSupplier = {
+        supplierName: formData.supplierName.trim(),
+        product: formData.product.trim(),
+        contactNumber: formData.contactNumber.trim(),
+        email: formData.email.trim(),
+        type: formData.type,
+        onTheWay: parseInt(formData.onTheWay || '0', 10),
+      };
+      await writeSupplierData(newSupplier);
+      handleCloseModal();
+      setPage(0);
+      await loadSuppliers();
+    } catch (e) {
+      console.error('Failed to add supplier', e);
+      setError('Failed to add supplier');
+    }
   };
 
   return (
@@ -241,6 +256,12 @@ export default function SupplierTable() {
         )}
 
         <Box sx={{ width: '100%', height: 'auto' }}>
+          <div style={{ display: 'flex', justifyContent: 'end', alignItems: 'center', gap: '12px', marginBottom: '8px' }}>
+            {error && (
+              <Typography color="error" variant="body2" sx={{ m: 0 }}>{error}</Typography>
+            )}
+            <Button onClick={loadSuppliers} variant="outlined" size="small">Refresh</Button>
+          </div>
           <TableContainer component={Paper} sx={{ boxShadow: 3, borderRadius: 0 }}>
             <Table sx={{ width: '100%', borderCollapse: 'collapse', height: '100%' }} aria-label="suppliers table">
               <TableHead>
@@ -256,8 +277,15 @@ export default function SupplierTable() {
               </TableHead>
 
               <TableBody>
-                {paged.map((s, idx) => (
-                  <StyledTableRow key={`${s.supplierName}-${idx}`}>
+                {loading && (
+                  <TableRow>
+                    <TableCell colSpan={7}>
+                      <Typography variant="body2">Loading suppliers...</Typography>
+                    </TableCell>
+                  </TableRow>
+                )}
+                {!loading && paged.map((s, idx) => (
+                  <StyledTableRow key={s.id || `${s.supplierName}-${idx}`}>
                     <TableCell>{s.supplierName}</TableCell>
                     <TableCell>{s.product}</TableCell>
                     <TableCell>{s.contactNumber}</TableCell>
@@ -266,7 +294,7 @@ export default function SupplierTable() {
                     <TableCell>{s.onTheWay}</TableCell>
                     <TableCell>
                       <button
-                        onClick={() => handleDeleteSupplier(page * rowsPerPage + idx)}
+                        onClick={() => handleDeleteSupplier(idx)}
                         style={{
                           maxWidth: '100px',
                           height: '40px',
@@ -293,7 +321,7 @@ export default function SupplierTable() {
                   </StyledTableRow>
                 ))}
 
-                {paged.length < rowsPerPage && (
+                {!loading && paged.length < rowsPerPage && (
                   <TableRow style={{ height: 30 * (rowsPerPage - paged.length) }}>
                     <TableCell colSpan={7} />
                   </TableRow>

@@ -138,3 +138,20 @@ button.edit-button:hover {
     gap: 20px;
     border-radius: 8px;
 }
+
+/* Match refresh button style to add-store */
+.store-refresh-btn {
+    max-width: 110px;
+    height: 40px;
+    border-radius: 8px;
+    background: #fff;
+    color: var(--Grey-600);
+    font-family: Inter;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 20px;
+    border: 1px solid var(--Gray-50);
+    cursor: pointer;
+    transition: all .3s ease-out;
+}
+.store-refresh-btn:hover { background: var(--Gray-50); }
