@@ -313,11 +313,11 @@ export default function SalesAndProduct() {
                         <Table size="small" stickyHeader aria-label="inventory table" sx={{ borderCollapse: 'collapse' }}>
                             <TableHead>
                                 <TableRow sx={{ backgroundColor: 'primary.main' }}>
-                                    <TableCell sx={{ color: '#fff', fontWeight: 'bold' }}>Product</TableCell>
-                                    <TableCell sx={{ color: '#fff', fontWeight: 'bold' }} align="right">Price</TableCell>
-                                    <TableCell sx={{ color: '#fff', fontWeight: 'bold' }} align="right">Qty</TableCell>
-                                    <TableCell sx={{ color: '#fff', fontWeight: 'bold' }} align="center">Avail.</TableCell>
-                                    <TableCell sx={{ color: '#fff', fontWeight: 'bold' }} align="center">Action</TableCell>
+                                    <TableCell sx={{ color: 'black', fontWeight: 'bold' }}>Product</TableCell>
+                                    <TableCell sx={{ color: 'black', fontWeight: 'bold' }} align="right">Price</TableCell>
+                                    <TableCell sx={{ color: 'black', fontWeight: 'bold' }} align="right">Qty</TableCell>
+                                    <TableCell sx={{ color: 'black', fontWeight: 'bold' }} align="center">Avail.</TableCell>
+                                    <TableCell sx={{ color: 'black', fontWeight: 'bold' }} align="center">Action</TableCell>
                                 </TableRow>
                             </TableHead>
                             <TableBody>
@@ -331,14 +331,14 @@ export default function SalesAndProduct() {
                                         <TableRow key={p.id} hover>
                                             <TableCell sx={{ fontSize: 14 }}>{p.product}</TableCell>
                                             <TableCell align="right" sx={{ fontSize: 14 }}>{formatCurrency(p.buyingPrice)}</TableCell>
-                                            <TableCell align="right" sx={{ fontSize: 14 }}>{p.quantity}</TableCell>
+                                            <TableCell align="right" sx={{color:'black', fontSize: 14 }}>{p.quantity}</TableCell>
                                             <TableCell align="center">
                                                 <Chip
                                                     size="small"
                                                     label={chip.label}
                                                     {...(!forceWhite ? { color: chip.color } : {})}
-                                                    sx={forceWhite ? { backgroundColor: '#fff', border: '1px solid #e0e0e0', color: '#333' } : {}}
-                                                />
+                                                    sx={forceWhite ? { backgroundColor: '#fff', border: '1px solid #e0e0e0', color: '#460c0cff' } : {}}
+                                                /> 
                                             </TableCell>
                                             <TableCell align="center">
                                                 <Button
@@ -385,11 +385,11 @@ export default function SalesAndProduct() {
                                                 <Table size="small" stickyHeader aria-label="sales log" sx={{ borderCollapse: 'collapse' }}>
                                                     <TableHead>
                                                         <TableRow sx={{ backgroundColor: 'primary.main' }}>
-                                                            <TableCell sx={{ color: '#fff', fontWeight: 'bold' }}>Time</TableCell>
-                                                            <TableCell sx={{ color: '#fff', fontWeight: 'bold' }}>Invoice</TableCell>
-                                                            <TableCell sx={{ color: '#fff', fontWeight: 'bold' }}>Items</TableCell>
-                                                            <TableCell sx={{ color: '#fff', fontWeight: 'bold' }} align="right">Subtotal</TableCell>
-                                                            <TableCell sx={{ color: '#fff', fontWeight: 'bold' }}>User</TableCell>
+                                                            <TableCell sx={{ color: 'black', fontWeight: 'bold' }}>Time</TableCell>
+                                                            <TableCell sx={{ color: 'black', fontWeight: 'bold' }}>Invoice</TableCell>
+                                                            <TableCell sx={{ color: 'black', fontWeight: 'bold' }}>Items</TableCell>
+                                                            <TableCell sx={{ color: 'black', fontWeight: 'bold' }} align="right">Subtotal</TableCell>
+                                                            <TableCell sx={{ color: 'black', fontWeight: 'bold' }}>User</TableCell>
                                                         </TableRow>
                                                     </TableHead>
                                                     <TableBody>
